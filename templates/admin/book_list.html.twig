@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Catalogue (admin){% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container dashboard-page">
+        <h1 class="page-title">Ouvrages</h1>
+        <p><a href="{{ path('app_admin_book_new') }}" class="btn btn--primary">Nouvel ouvrage</a></p>
+        <ul class="book-grid" style="margin-top:1rem;">
+            {% for book in books %}
+                <li class="book-card">
+                    <a href="{{ path('app_book_show', { id: book.id }) }}" class="book-card__link">
+                        <span class="book-card__title">{{ book.title }}</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="book-card book-card--empty">Aucun ouvrage.</li>
+            {% endfor %}
+        </ul>
+    </main>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion — Biblio Connect{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+
+    <main class="container auth-page">
+        <h1 class="page-title">Connexion</h1>
+        {% if error %}
+            <p class="flash flash--error">{{ error.messageKey|trans(error.messageData, 'security') }}</p>
+        {% endif %}
+        <form method="post" action="{{ path('app_login') }}" class="form-card">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            <p>
+                <label for="username">E-mail</label>
+                <input type="email" id="username" name="_username" value="{{ last_username }}" required autofocus class="input">
+            </p>
+            <p>
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="_password" required class="input" autocomplete="current-password">
+            </p>
+            <button type="submit" class="btn btn--primary btn--block">Se connecter</button>
+        </form>
+        <p class="auth-page__footer">
+            <a href="{{ path('app_home') }}">← Accueil</a>
+            · <a href="{{ path('app_register') }}">Créer un compte</a>
+        </p>
+    </main>
+{% endblock %}

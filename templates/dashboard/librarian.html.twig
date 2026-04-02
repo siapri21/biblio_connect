@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Espace bibliothécaire — Biblio Connect{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container dashboard-page">
+        <h1 class="page-title">Espace bibliothécaire</h1>
+        <p>Bienvenue, {{ app.user.userIdentifier }}.</p>
+        <ul class="dashboard-links">
+            <li><a href="{{ path('app_admin_book_list') }}">Catalogue (gestion)</a></li>
+            <li><a href="{{ path('app_admin_book_new') }}">Ajouter un ouvrage</a></li>
+            <li><a href="{{ path('app_catalog') }}">Voir le catalogue public</a></li>
+        </ul>
+    </main>
+{% endblock %}

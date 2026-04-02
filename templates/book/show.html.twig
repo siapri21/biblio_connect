@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book.title }} — Biblio Connect{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container page-book">
+        <p class="breadcrumb">
+            <a href="{{ path('app_home') }}">Accueil</a>
+            · <a href="{{ path('app_catalog') }}">Catalogue</a>
+        </p>
+        <article class="book-detail">
+            <h1 class="page-title">{{ book.title }}</h1>
+            <p><strong>Auteur :</strong> {{ book.author }}</p>
+            <p><strong>Catégorie :</strong> {{ book.category }} · <strong>Langue :</strong> {{ book.language }}</p>
+            <p><strong>Stock :</strong> {{ book.stock }}</p>
+            {% if book.description %}
+                <div class="book-detail__desc">{{ book.description|nl2br }}</div>
+            {% endif %}
+        </article>
+    </main>
+{% endblock %}

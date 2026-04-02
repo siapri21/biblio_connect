@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Espace usager — Biblio Connect{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container dashboard-page">
+        <h1 class="page-title">Espace usager</h1>
+        <p>Bienvenue, {{ app.user.userIdentifier }}.</p>
+        <ul class="dashboard-links">
+            <li><a href="{{ path('app_catalog') }}">Catalogue</a></li>
+            <li><a href="{{ path('app_home') }}">Page d’accueil</a></li>
+        </ul>
+    </main>
+{% endblock %}

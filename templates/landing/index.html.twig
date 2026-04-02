@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Biblio Connect — Votre bibliothèque en ligne{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+
+    <header class="hero">
+        <div class="hero__inner container">
+            <p class="hero__eyebrow">Plateforme de gestion de bibliothèque</p>
+            <h1 class="hero__title">Lisez, réservez, partagez vos coups de cœur.</h1>
+            <p class="hero__lead">
+                Biblio Connect réunit usagers, bibliothécaires et administration : catalogue,
+                réservations, favoris et avis — tout au même endroit.
+            </p>
+            <div class="hero__actions">
+                <a href="{{ path('app_catalog') }}" class="btn btn--primary">Parcourir le catalogue</a>
+                {% if not app.user %}
+                    <a href="{{ path('app_register') }}" class="btn btn--ghost">Créer un compte</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <section class="section section--alt">
+        <div class="container grid-features">
+            <article class="feature">
+                <h2 class="feature__title">Espace usager</h2>
+                <p>Inscription, connexion, favoris, réservations et avis sur les livres lus.</p>
+            </article>
+            <article class="feature">
+                <h2 class="feature__title">Bibliothécaires</h2>
+                <p>Gestion du catalogue, fiches détaillées et suivi des réservations.</p>
+            </article>
+            <article class="feature">
+                <h2 class="feature__title">Administration</h2>
+                <p>Stocks, modération des commentaires et gestion des rôles et profils.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container cta-block">
+            <h2 class="cta-block__title">Prêt à commencer ?</h2>
+            <p class="cta-block__text">Découvrez les ouvrages disponibles ou connectez-vous à votre espace.</p>
+            <div class="hero__actions">
+                <a href="{{ path('app_catalog') }}" class="btn btn--primary">Voir le catalogue</a>
+                {% if not app.user %}
+                    <a href="{{ path('app_login') }}" class="btn btn--secondary">Se connecter</a>
+                {% else %}
+                    <a href="{{ path('app_user_dashboard') }}" class="btn btn--secondary">Mon espace</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="container site-footer__inner">
+            <span class="site-footer__brand">Biblio Connect</span>
+            <span class="site-footer__meta">Projet Symfony — rôles : usager, bibliothécaire, administrateur.</span>
+        </div>
+    </footer>
+{% endblock %}

@@ -1,0 +1,22 @@
+<nav class="site-nav">
+    <div class="site-nav__inner container">
+        <a href="{{ path('app_home') }}" class="site-nav__brand">Biblio Connect</a>
+        <div class="site-nav__links">
+            <a href="{{ path('app_catalog') }}">Catalogue</a>
+            {% if app.user %}
+                <a href="{{ path('app_user_dashboard') }}">Mon espace</a>
+                {% if is_granted('ROLE_LIBRARIAN') %}
+                    <a href="{{ path('app_librarian_dashboard') }}">Bibliothèque</a>
+                {% endif %}
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('app_admin_dashboard') }}">Admin</a>
+                {% endif %}
+                <span class="site-nav__user">{{ app.user.userIdentifier }}</span>
+                <a href="{{ path('app_logout') }}">Déconnexion</a>
+            {% else %}
+                <a href="{{ path('app_login') }}">Connexion</a>
+                <a href="{{ path('app_register') }}" class="btn btn--nav">Inscription</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

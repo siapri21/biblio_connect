@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration — Biblio Connect{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container dashboard-page">
+        <h1 class="page-title">Administration</h1>
+        <p>Bienvenue, {{ app.user.userIdentifier }}.</p>
+        <ul class="dashboard-links">
+            <li><a href="{{ path('app_admin_book_list') }}">Catalogue</a></li>
+            <li><a href="{{ path('app_admin_book_new') }}">Ajouter un ouvrage</a></li>
+            <li><a href="{{ path('app_catalog') }}">Catalogue public</a></li>
+        </ul>
+    </main>
+{% endblock %}
