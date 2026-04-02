@@ -22,6 +22,31 @@
         </div>
     </header>
 
+    {% if highlightBooks is not empty %}
+        <section class="section section--books">
+            <div class="container">
+                <h2 class="section-title">En librairie</h2>
+                <p class="section-lead">Un aperçu des derniers ouvrages ajoutés au catalogue.</p>
+                <ul class="book-grid book-grid--landing">
+                    {% for book in highlightBooks %}
+                        <li class="book-card book-card--with-cover">
+                            <a href="{{ path('app_book_show', { id: book.id }) }}" class="book-card__link">
+                                {% include '_partials/_book_cover.html.twig' with { book: book } %}
+                                <div class="book-card__body">
+                                    <span class="book-card__title">{{ book.title }}</span>
+                                    <span class="book-card__author">{{ book.author }}</span>
+                                </div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p class="section-cta">
+                    <a href="{{ path('app_catalog') }}" class="btn btn--secondary">Voir tout le catalogue</a>
+                </p>
+            </div>
+        </section>
+    {% endif %}
+
     <section class="section section--alt">
         <div class="container grid-features">
             <article class="feature">

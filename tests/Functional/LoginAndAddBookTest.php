@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional;
 
+use App\Entity\Library;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -15,6 +16,13 @@ class LoginAndAddBookTest extends WebTestCase
         $container = static::getContainer();
         $em = $container->get(EntityManagerInterface::class);
         $hasher = $container->get(UserPasswordHasherInterface::class);
+
+        $library = (new Library())
+            ->setName('Bibliothèque fixture')
+            ->setAddress('2 avenue Test')
+            ->setCity('Lyon');
+        $em->persist($library);
+        $em->flush();
 
         $librarian = (new User())
             ->setEmail('biblio@test.local')
@@ -37,18 +45,20 @@ class LoginAndAddBookTest extends WebTestCase
         $crawler = $client->request('GET', '/admin/catalogue/ouvrage/nouveau');
         self::assertResponseIsSuccessful();
 
-        $form = $crawler->filter('form')->form([
+        $form = $crawler->selectButton('Enregistrer')->form([
             'title' => 'Nouveau titre',
             'author' => 'Auteur X',
             'category' => 'SF',
             'language' => 'fr',
             'stock' => '5',
+            'library_id' => (string) $library->getId(),
             'description' => 'Résumé',
         ]);
         $client->submit($form);
 
         self::assertResponseRedirects();
         $client->followRedirect();
-        self::assertSelectorTextContains('h1', 'Nouveau titre');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1.page-title', 'Nouveau titre');
     }
 }

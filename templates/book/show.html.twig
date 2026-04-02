@@ -9,14 +9,120 @@
             <a href="{{ path('app_home') }}">Accueil</a>
             · <a href="{{ path('app_catalog') }}">Catalogue</a>
         </p>
+
+        {% for message in app.flashes('success') %}
+            <p class="flash flash--success">{{ message }}</p>
+        {% endfor %}
+        {% for message in app.flashes('info') %}
+            <p class="flash flash--info">{{ message }}</p>
+        {% endfor %}
+        {% for message in app.flashes('danger') %}
+            <p class="flash flash--error">{{ message }}</p>
+        {% endfor %}
+
         <article class="book-detail">
-            <h1 class="page-title">{{ book.title }}</h1>
-            <p><strong>Auteur :</strong> {{ book.author }}</p>
-            <p><strong>Catégorie :</strong> {{ book.category }} · <strong>Langue :</strong> {{ book.language }}</p>
-            <p><strong>Stock :</strong> {{ book.stock }}</p>
-            {% if book.description %}
-                <div class="book-detail__desc">{{ book.description|nl2br }}</div>
-            {% endif %}
+            <div class="book-detail__layout">
+                <div class="book-detail__cover">
+                    {% include '_partials/_book_cover.html.twig' with { book: book, variant: 'hero' } %}
+                </div>
+                <div class="book-detail__main">
+                    <h1 class="page-title">{{ book.title }}</h1>
+                    <p><strong>Auteur :</strong> {{ book.author }}</p>
+                    <p><strong>Catégorie :</strong> {{ book.category }} · <strong>Langue :</strong> {{ book.language }}</p>
+                    <p><strong>Stock :</strong> {{ book.stock }}</p>
+
+                    {% if book.library %}
+                        <div class="book-library">
+                            <p class="book-library__title"><strong>Disponible à</strong></p>
+                            <p class="book-library__name">{{ book.library.name }}</p>
+                            <p class="book-library__addr">{{ book.library.address }}{% if book.library.city %} — {{ book.library.city }}{% endif %}</p>
+                        </div>
+                    {% endif %}
+
+                    {% if avgRating is not null %}
+                        <p class="book-rating-summary">
+                            <strong>Note moyenne :</strong>
+                            <span class="book-stars" aria-hidden="true">{% for i in 1..(avgRating|round(0, 'floor')) %}★{% endfor %}</span>
+                            <span class="text-muted">{{ avgRating|number_format(1, ',', ' ') }} / 5 ({{ reviewCount }} avis)</span>
+                        </p>
+                    {% endif %}
+
+                    <div class="book-actions">
+                        {% if app.user %}
+                            {% if userHasActiveReservation %}
+                                <p class="book-actions__reserved-note">
+                                    Vous avez déjà une <strong>réservation en cours</strong> pour cet ouvrage.
+                                    Consultez <a href="{{ path('app_user_dashboard') }}">Mon espace</a> pour le suivi.
+                                </p>
+                            {% else %}
+                                <form method="post" action="{{ path('app_book_reserve', { id: book.id }) }}" class="book-actions__form book-actions__form--reserve">
+                                    <input type="hidden" name="reserve_token" value="{{ csrf_token('reserve_book') }}">
+                                    <label class="book-actions__date-label">
+                                        Date de retrait souhaitée
+                                        <input type="date" name="pickup_date" required class="input book-actions__date"
+                                               min="{{ reservationMinDate }}" max="{{ reservationMaxDate }}"
+                                               value="{{ reservationMinDate }}">
+                                    </label>
+                                    <button type="submit" class="btn btn--primary">Réserver</button>
+                                </form>
+                            {% endif %}
+                            <form method="post" action="{{ path('app_book_favorite_toggle', { id: book.id }) }}" class="book-actions__form">
+                                <input type="hidden" name="favorite_token" value="{{ csrf_token('favorite_toggle') }}">
+                                <button type="submit" class="btn btn--secondary">
+                                    {% if isFavorite %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}
+                                </button>
+                            </form>
+                        {% else %}
+                            {% set path_here = app.request.pathinfo %}
+                            <a href="{{ path('app_login', { redirect: path_here, from: 'reserve' }) }}" class="btn btn--primary">Réserver</a>
+                            <a href="{{ path('app_login', { redirect: path_here, from: 'favorite' }) }}" class="btn btn--secondary">Favoris</a>
+                            <p class="book-actions__hint">
+                                Ces actions nécessitent un compte :
+                                <a href="{{ path('app_register', { redirect: path_here, from: 'reserve' }) }}">inscription</a>
+                                ou
+                                <a href="{{ path('app_login', { redirect: path_here }) }}">connexion</a>
+                                (vous reviendrez sur cette fiche après connexion).
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    {% if book.description %}
+                        <div class="book-detail__desc">{{ book.description|nl2br }}</div>
+                    {% endif %}
+
+                    {% if app.user and userReview %}
+                        <section class="book-my-review">
+                            <h2 class="book-section-title">Votre avis</h2>
+                            <p class="book-stars" aria-hidden="true">{% for i in 1..userReview.rating %}★{% endfor %}</p>
+                            <p>{{ userReview.comment|nl2br }}</p>
+                        </section>
+                    {% elseif app.user and reviewForm %}
+                        <section class="book-review-form-section">
+                            <h2 class="book-section-title">Donner votre avis</h2>
+                            {{ form_start(reviewForm, { action: path('app_book_review', { id: book.id }), attr: { class: 'review-form' } }) }}
+                                {{ form_row(reviewForm.rating) }}
+                                {{ form_row(reviewForm.comment) }}
+                                <button type="submit" class="btn btn--primary">Publier</button>
+                            {{ form_end(reviewForm) }}
+                        </section>
+                    {% endif %}
+
+                    {% if reviews is not empty %}
+                        <section class="book-reviews">
+                            <h2 class="book-section-title">Avis des lecteurs</h2>
+                            <ul class="book-reviews__list">
+                                {% for r in reviews %}
+                                    <li class="book-reviews__item">
+                                        <p class="book-stars" aria-hidden="true">{% for i in 1..r.rating %}★{% endfor %}</p>
+                                        <p class="book-reviews__meta text-muted">{{ r.createAd|date('d/m/Y') }}</p>
+                                        <p>{{ r.comment|nl2br }}</p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                    {% endif %}
+                </div>
+            </div>
         </article>
     </main>
 {% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes favoris — Biblio Connect{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container page-catalog">
+        <h1 class="page-title">Mes favoris</h1>
+        <p class="text-muted catalog-intro">
+            Les ouvrages que vous avez ajoutés depuis le catalogue.
+        </p>
+        <ul class="book-grid">
+            {% for favorite in favorites %}
+                {% set book = favorite.book %}
+                {% if book %}
+                    <li class="book-card book-card--with-cover">
+                        <a href="{{ path('app_book_show', { id: book.id }) }}" class="book-card__link">
+                            {% include '_partials/_book_cover.html.twig' with { book: book } %}
+                            <div class="book-card__body">
+                                <span class="book-card__title">{{ book.title }}</span>
+                                <span class="book-card__author">{{ book.author }}</span>
+                            </div>
+                        </a>
+                    </li>
+                {% endif %}
+            {% else %}
+                <li class="book-card book-card--empty">
+                    Aucun favori pour le moment.
+                    <a href="{{ path('app_catalog') }}">Parcourir le catalogue</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </main>
+{% endblock %}

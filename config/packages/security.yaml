@@ -36,6 +36,7 @@ security:
         - { path: ^/admin/catalogue, roles: ROLE_LIBRARIAN }
         - { path: ^/bibliotheque, roles: ROLE_LIBRARIAN }
         - { path: ^/espace, roles: ROLE_USER }
+        - { path: ^/favoris, roles: ROLE_USER }
 
 when@test:
     security:

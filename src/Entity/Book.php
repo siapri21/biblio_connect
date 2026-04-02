@@ -37,11 +37,15 @@ class Book
     #[ORM\Column]
     private int $stock = 0;
 
+    #[ORM\ManyToOne(inversedBy: 'books')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Library $library = null;
+
     /**
      * @var Collection<int, Reservation>
      */
     #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'book')]
-    private Collection $startAt;
+    private Collection $reservations;
 
     /**
      * @var Collection<int, Favorite>
@@ -57,7 +61,7 @@ class Book
 
     public function __construct()
     {
-        $this->startAt = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
         $this->favorites = new ArrayCollection();
         $this->reviews = new ArrayCollection();
     }
@@ -151,30 +155,41 @@ class Book
         return $this;
     }
 
+    public function getLibrary(): ?Library
+    {
+        return $this->library;
+    }
+
+    public function setLibrary(?Library $library): static
+    {
+        $this->library = $library;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Reservation>
      */
-    public function getStartAt(): Collection
+    public function getReservations(): Collection
     {
-        return $this->startAt;
+        return $this->reservations;
     }
 
-    public function addStartAt(Reservation $startAt): static
+    public function addReservation(Reservation $reservation): static
     {
-        if (!$this->startAt->contains($startAt)) {
-            $this->startAt->add($startAt);
-            $startAt->setBook($this);
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setBook($this);
         }
 
         return $this;
     }
 
-    public function removeStartAt(Reservation $startAt): static
+    public function removeReservation(Reservation $reservation): static
     {
-        if ($this->startAt->removeElement($startAt)) {
-            // set the owning side to null (unless already changed)
-            if ($startAt->getBook() === $this) {
-                $startAt->setBook(null);
+        if ($this->reservations->removeElement($reservation)) {
+            if ($reservation->getBook() === $this) {
+                $reservation->setBook(null);
             }
         }
 

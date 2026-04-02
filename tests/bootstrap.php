@@ -16,7 +16,8 @@ if (($_SERVER['APP_ENV'] ?? '') === 'test') {
         unlink($testDb);
     }
 
-    $kernel = new Kernel('test', false);
+    // debug=true : évite d’utiliser un cache Doctrine / conteneur obsolète sans is_verified sur user.
+    $kernel = new Kernel('test', true);
     $kernel->boot();
     $container = $kernel->getContainer();
     $em = $container->get('doctrine')->getManager();

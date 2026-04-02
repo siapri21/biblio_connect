@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
+use App\Security\RedirectTargetHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,6 +27,7 @@ class RegistrationController extends AbstractController
     #[Route('/register', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
     {
+        $redirectFromQuery = RedirectTargetHelper::sanitize($request->query->get('redirect'));
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
@@ -49,13 +51,20 @@ class RegistrationController extends AbstractController
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
 
-            // do anything else you need here, like send an email
+            $security->login($user, 'form_login', 'main');
 
-            return $security->login($user, 'form_login', 'main');
+            $after = RedirectTargetHelper::sanitize($request->request->get('redirect')) ?? $redirectFromQuery;
+            if ($after !== null) {
+                return $this->redirect($after);
+            }
+
+            return $this->redirectToRoute('app_user_dashboard');
         }
 
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form,
+            'redirect_path' => $redirectFromQuery,
+            'from_action' => $request->query->get('from', ''),
         ]);
     }
 

@@ -13,6 +13,15 @@
             <p><label>Catégorie <input name="category" required class="input"></label></p>
             <p><label>Langue <input name="language" required class="input"></label></p>
             <p><label>Stock <input name="stock" type="number" min="0" value="1" required class="input"></label></p>
+            <p>
+                <label>Bibliothèque de rattachement
+                    <select name="library_id" class="input" required>
+                        {% for lib in libraries %}
+                            <option value="{{ lib.id }}">{{ lib.label }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </p>
             <p><label>Description <textarea name="description" rows="4" class="input"></textarea></label></p>
             <button type="submit" class="btn btn--primary">Enregistrer</button>
         </form>

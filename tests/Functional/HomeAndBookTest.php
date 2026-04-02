@@ -3,6 +3,7 @@
 namespace App\Tests\Functional;
 
 use App\Entity\Book;
+use App\Entity\Library;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -14,12 +15,20 @@ class HomeAndBookTest extends WebTestCase
         $container = static::getContainer();
         $em = $container->get(EntityManagerInterface::class);
 
+        $library = (new Library())
+            ->setName('Bibliothèque test')
+            ->setAddress('1 rue du Test')
+            ->setCity('Paris');
+        $em->persist($library);
+        $em->flush();
+
         $book = (new Book())
             ->setTitle('Livre test')
             ->setAuthor('Jean Dupont')
             ->setCategory('Essai')
             ->setLanguage('fr')
-            ->setStock(2);
+            ->setStock(2)
+            ->setLibrary($library);
         $em->persist($book);
         $em->flush();
 

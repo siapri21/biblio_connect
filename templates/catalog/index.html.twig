@@ -6,17 +6,33 @@
     {% include '_partials/_nav.html.twig' %}
     <main class="container page-catalog">
         <h1 class="page-title">Catalogue</h1>
-        <p class="text-muted">Recherche par titre, auteur ou catégorie (à venir).</p>
+        {% if searchQuery is defined and searchQuery|trim != '' %}
+            <p class="catalog-intro">
+                Résultats pour « <strong>{{ searchQuery|e }}</strong> »
+                — <a href="{{ path('app_catalog') }}">tout afficher</a>
+            </p>
+        {% else %}
+            <p class="text-muted catalog-intro">Recherchez par titre, auteur ou catégorie (barre ci-dessus ou raccourci catalogue).</p>
+        {% endif %}
         <ul class="book-grid">
             {% for book in books %}
-                <li class="book-card">
+                <li class="book-card book-card--with-cover">
                     <a href="{{ path('app_book_show', { id: book.id }) }}" class="book-card__link">
-                        <span class="book-card__title">{{ book.title }}</span>
-                        <span class="book-card__author">{{ book.author }}</span>
+                        {% include '_partials/_book_cover.html.twig' with { book: book } %}
+                        <div class="book-card__body">
+                            <span class="book-card__title">{{ book.title }}</span>
+                            <span class="book-card__author">{{ book.author }}</span>
+                        </div>
                     </a>
                 </li>
             {% else %}
-                <li class="book-card book-card--empty">Aucun ouvrage pour le moment.</li>
+                <li class="book-card book-card--empty">
+                    {% if searchQuery is defined and searchQuery|trim != '' %}
+                        Aucun ouvrage ne correspond à votre recherche.
+                    {% else %}
+                        Aucun ouvrage pour le moment.
+                    {% endif %}
+                </li>
             {% endfor %}
         </ul>
     </main>

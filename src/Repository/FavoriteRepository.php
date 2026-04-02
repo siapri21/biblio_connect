@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Book;
 use App\Entity\Favorite;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +16,35 @@ class FavoriteRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Favorite::class);
+    }
+
+    public function findOneByMemberAndBook(User $member, Book $book): ?Favorite
+    {
+        return $this->findOneBy(['member' => $member, 'book' => $book]);
+    }
+
+    /**
+     * @return Favorite[]
+     */
+    public function findByMemberOrdered(User $member): array
+    {
+        return $this->createQueryBuilder('f')
+            ->leftJoin('f.book', 'b')->addSelect('b')
+            ->andWhere('f.member = :member')
+            ->setParameter('member', $member)
+            ->orderBy('f.createAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countByMember(User $member): int
+    {
+        return (int) $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
+            ->andWhere('f.member = :member')
+            ->setParameter('member', $member)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     //    /**

@@ -12,9 +12,24 @@
 
         <h1 class="page-title">Créer un compte</h1>
 
+        {% if redirect_path is defined and redirect_path %}
+            <p class="flash flash--info">
+                {% if from_action == 'reserve' %}
+                    Créez un compte pour <strong>réserver</strong> cet ouvrage.
+                {% elseif from_action == 'favorite' %}
+                    Créez un compte pour ajouter ce livre à vos <strong>favoris</strong>.
+                {% else %}
+                    Créez un compte pour continuer.
+                {% endif %}
+            </p>
+        {% endif %}
+
         {{ form_errors(registrationForm) }}
 
         {{ form_start(registrationForm, { attr: { class: 'form-card' } }) }}
+            {% if redirect_path is defined and redirect_path %}
+                <input type="hidden" name="redirect" value="{{ redirect_path }}">
+            {% endif %}
             {{ form_row(registrationForm.email) }}
             {{ form_row(registrationForm.plainPassword.first) }}
             {{ form_row(registrationForm.plainPassword.second) }}
@@ -23,6 +38,11 @@
             <button type="submit" class="btn btn--primary btn--block">S’inscrire</button>
         {{ form_end(registrationForm) }}
 
-        <p class="auth-page__footer"><a href="{{ path('app_login') }}">Déjà un compte ? Connexion</a></p>
+        <p class="auth-page__footer">
+            {% set login_params = {} %}
+            {% if redirect_path is defined and redirect_path %}{% set login_params = login_params|merge({ redirect: redirect_path }) %}{% endif %}
+            {% if from_action is defined and from_action %}{% set login_params = login_params|merge({ from: from_action }) %}{% endif %}
+            <a href="{{ path('app_login', login_params) }}">Déjà un compte ? Connexion</a>
+        </p>
     </main>
 {% endblock %}

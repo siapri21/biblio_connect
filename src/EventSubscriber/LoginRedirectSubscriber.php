@@ -3,6 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Security\LoginTargetResolver;
+use App\Security\RedirectTargetHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -23,6 +24,18 @@ class LoginRedirectSubscriber implements EventSubscriberInterface
 
     public function onLoginSuccess(LoginSuccessEvent $event): void
     {
+        $request = $event->getRequest();
+        if ($request->attributes->get('_route') === 'app_register') {
+            return;
+        }
+
+        $targetPath = RedirectTargetHelper::sanitize($request->request->get('_target_path'));
+        if ($targetPath !== null) {
+            $event->setResponse(new RedirectResponse($targetPath));
+
+            return;
+        }
+
         $route = $this->loginTargetResolver->routeNameForRoles($event->getUser()->getRoles());
         $event->setResponse(new RedirectResponse($this->urlGenerator->generate($route)));
     }

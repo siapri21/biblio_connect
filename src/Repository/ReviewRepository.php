@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Book;
 use App\Entity\Review;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +16,52 @@ class ReviewRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Review::class);
+    }
+
+    /**
+     * @return Review[]
+     */
+    public function findVisibleByBookOrdered(Book $book): array
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.book = :b')
+            ->andWhere('r.isVisible = true')
+            ->setParameter('b', $book)
+            ->orderBy('r.createAd', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findOneByUserAndBook(User $user, Book $book): ?Review
+    {
+        return $this->findOneBy(['reservedBy' => $user, 'book' => $book]);
+    }
+
+    /**
+     * @return Review[]
+     */
+    public function findByMemberOrdered(User $member): array
+    {
+        return $this->createQueryBuilder('r')
+            ->leftJoin('r.book', 'b')->addSelect('b')
+            ->andWhere('r.reservedBy = :u')
+            ->setParameter('u', $member)
+            ->orderBy('r.createAd', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function averageRatingForBook(Book $book): ?float
+    {
+        $result = $this->createQueryBuilder('r')
+            ->select('AVG(r.rating)')
+            ->andWhere('r.book = :b')
+            ->andWhere('r.isVisible = true')
+            ->setParameter('b', $book)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $result !== null ? (float) $result : null;
     }
 
     //    /**

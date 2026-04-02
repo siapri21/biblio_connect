@@ -27,13 +27,6 @@ doctrine:
         controller_resolver:
             auto_mapping: false
 
-when@test:
-    doctrine:
-        dbal:
-            # Désactivé : avec SQLite fichier, le suffixe crée un 2ᵉ fichier sans le schéma du bootstrap PHPUnit.
-            # Réactive `_test%env(default::TEST_TOKEN)%` si tu utilises ParaTest + PostgreSQL.
-            # dbname_suffix: '_test%env(default::TEST_TOKEN)%'
-
 when@prod:
     doctrine:
         orm:
