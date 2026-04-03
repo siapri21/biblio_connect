@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des réservations — Biblio Connect{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container dashboard-page staff-reservations">
+        <p class="breadcrumb">
+            <a href="{{ path('app_librarian_dashboard') }}">Espace bibliothécaire</a>
+            · Historique des réservations
+        </p>
+
+        <h1 class="page-title">
+            {% if filterStatus == 'pending' %}
+                Réservations en attente
+            {% else %}
+                Historique des réservations
+            {% endif %}
+        </h1>
+        <p class="text-muted staff-reservations__intro">
+            {% if filterStatus == 'pending' %}
+                Demandes à traiter (statut « en attente »), les plus récentes en premier.
+            {% else %}
+                Toutes les réservations enregistrées (tous les usagers), triées par date de demande.
+            {% endif %}
+        </p>
+
+        <nav class="staff-reservations-filters" aria-label="Filtrer par statut">
+            <a href="{{ path('app_librarian_reservations') }}" class="staff-filter-link {{ filterStatus is null ? 'staff-filter-link--active' }}">Toutes</a>
+            <a href="{{ path('app_librarian_reservations', { status: 'pending' }) }}" class="staff-filter-link {{ filterStatus == 'pending' ? 'staff-filter-link--active' }}">En attente</a>
+            <a href="{{ path('app_librarian_reservations', { status: 'confirmed' }) }}" class="staff-filter-link {{ filterStatus == 'confirmed' ? 'staff-filter-link--active' }}">Confirmées</a>
+            <a href="{{ path('app_librarian_reservations', { status: 'completed' }) }}" class="staff-filter-link {{ filterStatus == 'completed' ? 'staff-filter-link--active' }}">Terminées</a>
+            <a href="{{ path('app_librarian_reservations', { status: 'cancelled' }) }}" class="staff-filter-link {{ filterStatus == 'cancelled' ? 'staff-filter-link--active' }}">Annulées</a>
+        </nav>
+
+        {% if reservations is empty %}
+            <p class="dashboard-card__empty">Aucune réservation pour le moment.</p>
+        {% else %}
+            <div class="staff-table-wrap">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Demandé le</th>
+                            <th scope="col">Usager</th>
+                            <th scope="col">Ouvrage</th>
+                            <th scope="col">Bibliothèque</th>
+                            <th scope="col">Période de prêt</th>
+                            <th scope="col">Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reservations %}
+                            <tr>
+                                <td>{{ r.createdAt|date('d/m/Y H:i') }}</td>
+                                <td>{{ r.member ? r.member.userIdentifier : '—' }}</td>
+                                <td>
+                                    {% if r.book %}
+                                        <a href="{{ path('app_book_show', { id: r.book.id }) }}">{{ r.book.title }}</a>
+                                        <span class="text-muted"> — {{ r.book.author }}</span>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if r.book and r.book.library %}
+                                        {{ r.book.library.name }}{% if r.book.library.city %} ({{ r.book.library.city }}){% endif %}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>{{ r.startAt|date('d/m/Y') }} → {{ r.endAt|date('d/m/Y') }}</td>
+                                <td>
+                                    <span class="badge badge--{{ r.status == 'pending' ? 'pending' : (r.status == 'confirmed' ? 'ok' : 'neutral') }}">
+                                        {% if r.status == 'pending' %}En attente
+                                        {% elseif r.status == 'confirmed' %}Confirmée
+                                        {% elseif r.status == 'cancelled' %}Annulée
+                                        {% elseif r.status == 'completed' %}Terminée
+                                        {% else %}{{ r.status }}{% endif %}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </main>
+{% endblock %}

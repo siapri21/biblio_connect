@@ -4,13 +4,69 @@
 
 {% block body %}
     {% include '_partials/_nav.html.twig' %}
-    <main class="container dashboard-page">
-        <h1 class="page-title">Administration</h1>
-        <p>Bienvenue, {{ app.user.userIdentifier }}.</p>
-        <ul class="dashboard-links">
-            <li><a href="{{ path('app_admin_book_list') }}">Catalogue</a></li>
-            <li><a href="{{ path('app_admin_book_new') }}">Ajouter un ouvrage</a></li>
-            <li><a href="{{ path('app_catalog') }}">Catalogue public</a></li>
-        </ul>
+    <main class="container dashboard-page admin-dashboard">
+        <header class="admin-dashboard__header">
+            <p class="admin-dashboard__eyebrow">Console d’administration</p>
+            <h1 class="page-title admin-dashboard__title">Pilotage de la bibliothèque</h1>
+            <p class="admin-dashboard__subtitle">
+                Bonjour <strong>{{ app.user.userIdentifier }}</strong> — vue d’ensemble et accès rapides aux outils de gestion.
+            </p>
+        </header>
+
+        <section class="admin-stats" aria-label="Indicateurs">
+            <div class="admin-stats__item">
+                <span class="admin-stats__value">{{ statBooks }}</span>
+                <span class="admin-stats__label">Ouvrages au catalogue</span>
+            </div>
+            <div class="admin-stats__item admin-stats__item--accent">
+                <span class="admin-stats__value">{{ statReservationsPending }}</span>
+                <span class="admin-stats__label">Réservations en attente</span>
+            </div>
+            <div class="admin-stats__item">
+                <span class="admin-stats__value">{{ statReviewsVisible }}</span>
+                <span class="admin-stats__label">Avis publiés</span>
+            </div>
+        </section>
+
+        <section class="admin-actions" aria-labelledby="admin-actions-title">
+            <h2 id="admin-actions-title" class="visually-hidden">Actions</h2>
+            <div class="admin-actions__grid">
+                <a href="{{ path('app_librarian_reservations') }}" class="admin-action-card">
+                    <span class="admin-action-card__glyph" aria-hidden="true">R</span>
+                    <span class="admin-action-card__title">Historique des réservations</span>
+                    <span class="admin-action-card__desc">Suivi de toutes les demandes usagers, tous statuts.</span>
+                </a>
+                <a href="{{ path('app_librarian_reservations', { status: 'pending' }) }}" class="admin-action-card">
+                    <span class="admin-action-card__glyph" aria-hidden="true">⏳</span>
+                    <span class="admin-action-card__title">Réservations en attente</span>
+                    <span class="admin-action-card__desc">Filtrer les demandes à valider ou à refuser.</span>
+                </a>
+                <a href="{{ path('app_admin_book_list') }}" class="admin-action-card">
+                    <span class="admin-action-card__glyph" aria-hidden="true">C</span>
+                    <span class="admin-action-card__title">Catalogue (gestion)</span>
+                    <span class="admin-action-card__desc">Liste des ouvrages et accès aux fiches.</span>
+                </a>
+                <a href="{{ path('app_admin_book_new') }}" class="admin-action-card">
+                    <span class="admin-action-card__glyph" aria-hidden="true">+</span>
+                    <span class="admin-action-card__title">Nouvel ouvrage</span>
+                    <span class="admin-action-card__desc">Titres, auteurs, catégories, langues, image, stock.</span>
+                </a>
+                <a href="{{ path('app_admin_reviews') }}" class="admin-action-card">
+                    <span class="admin-action-card__glyph" aria-hidden="true">★</span>
+                    <span class="admin-action-card__title">Modération des avis</span>
+                    <span class="admin-action-card__desc">Afficher ou masquer les commentaires usagers.</span>
+                </a>
+                <a href="{{ path('app_admin_users') }}" class="admin-action-card">
+                    <span class="admin-action-card__glyph" aria-hidden="true">👤</span>
+                    <span class="admin-action-card__title">Utilisateurs et rôles</span>
+                    <span class="admin-action-card__desc">Attribuer le rôle usager, bibliothécaire ou admin.</span>
+                </a>
+                <a href="{{ path('app_catalog') }}" class="admin-action-card admin-action-card--muted">
+                    <span class="admin-action-card__glyph" aria-hidden="true">◇</span>
+                    <span class="admin-action-card__title">Catalogue public</span>
+                    <span class="admin-action-card__desc">Voir le site tel que les usagers.</span>
+                </a>
+            </div>
+        </section>
     </main>
 {% endblock %}

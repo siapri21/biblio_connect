@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\BookRepository;
 use App\Repository\FavoriteRepository;
 use App\Repository\ReservationRepository;
 use App\Repository\ReviewRepository;
@@ -33,14 +34,30 @@ class DashboardController extends AbstractController
     }
 
     #[Route('/bibliotheque', name: 'app_librarian_dashboard')]
-    public function librarian(): Response
-    {
-        return $this->render('dashboard/librarian.html.twig');
+    #[IsGranted('ROLE_LIBRARIAN')]
+    public function librarian(
+        BookRepository $bookRepository,
+        ReservationRepository $reservationRepository,
+        ReviewRepository $reviewRepository,
+    ): Response {
+        return $this->render('dashboard/librarian.html.twig', [
+            'statBooks' => $bookRepository->count([]),
+            'statReservationsPending' => $reservationRepository->countByStatus('pending'),
+            'statReviewsVisible' => $reviewRepository->countVisible(),
+        ]);
     }
 
     #[Route('/admin', name: 'app_admin_dashboard')]
-    public function admin(): Response
-    {
-        return $this->render('dashboard/admin.html.twig');
+    #[IsGranted('ROLE_ADMIN')]
+    public function admin(
+        BookRepository $bookRepository,
+        ReservationRepository $reservationRepository,
+        ReviewRepository $reviewRepository,
+    ): Response {
+        return $this->render('dashboard/admin.html.twig', [
+            'statBooks' => $bookRepository->count([]),
+            'statReservationsPending' => $reservationRepository->countByStatus('pending'),
+            'statReviewsVisible' => $reviewRepository->countVisible(),
+        ]);
     }
 }

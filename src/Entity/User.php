@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[UniqueEntity(fields: ['email'], message: 'Un compte existe déjà avec cette adresse e-mail. Utilisez la page « Connexion » ou choisissez une autre adresse.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -111,6 +111,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles = $roles;
 
         return $this;
+    }
+
+    /**
+     * Rôle « métier » pour l’UI admin (hors ROLE_USER implicite).
+     */
+    public function getPrimaryStaffRole(): string
+    {
+        if (in_array('ROLE_ADMIN', $this->roles, true)) {
+            return 'admin';
+        }
+        if (in_array('ROLE_LIBRARIAN', $this->roles, true)) {
+            return 'librarian';
+        }
+
+        return 'user';
     }
 
     /**

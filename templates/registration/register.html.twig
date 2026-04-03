@@ -5,12 +5,26 @@
 {% block body %}
     {% include '_partials/_nav.html.twig' %}
 
-    <main class="container auth-page">
+    <main class="container auth-page auth-page--wide">
         {% for flash_error in app.flashes('verify_email_error') %}
             <div class="flash flash--error" role="alert">{{ flash_error }}</div>
         {% endfor %}
 
-        <h1 class="page-title">Créer un compte</h1>
+        <header class="auth-page__header-block">
+            <h1 class="page-title">Créer un compte</h1>
+            <div class="auth-register-notice" role="note">
+                <p class="auth-register-notice__title">Compte usager</p>
+                <p>
+                    Ce formulaire crée un <strong>nouveau</strong> compte avec un <strong>nouvel e-mail</strong> (rôle usager uniquement).
+                    Les comptes <strong>bibliothécaire</strong> et <strong>administrateur</strong> ne s’obtiennent pas ici.
+                </p>
+                <p class="auth-register-notice__important">
+                    <strong>Important :</strong> si vous avez chargé les données de démo, les adresses comme
+                    <code>admin@biblio-connect.local</code> existent déjà — vous ne pouvez pas les « réinscrire ».
+                    Allez sur <a href="{{ path('app_login') }}">Connexion</a> et utilisez ce compte avec son mot de passe.
+                </p>
+            </div>
+        </header>
 
         {% if redirect_path is defined and redirect_path %}
             <p class="flash flash--info">

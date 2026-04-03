@@ -51,6 +51,31 @@ class ReviewRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function countVisible(): int
+    {
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->andWhere('r.isVisible = true')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Tous les avis (pour modération admin), du plus récent au plus ancien.
+     *
+     * @return Review[]
+     */
+    public function findAllForModerationOrdered(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->leftJoin('r.book', 'b')->addSelect('b')
+            ->leftJoin('r.reservedBy', 'u')->addSelect('u')
+            ->orderBy('r.createAd', 'DESC')
+            ->addOrderBy('r.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function averageRatingForBook(Book $book): ?float
     {
         $result = $this->createQueryBuilder('r')

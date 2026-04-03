@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book ? 'Modifier l’ouvrage' : 'Nouvel ouvrage' }}{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container dashboard-page">
+        <h1 class="page-title">{{ book ? 'Modifier l’ouvrage' : 'Ajouter un ouvrage' }}</h1>
+        <p class="text-muted staff-reservations__intro">
+            Fiche détaillée : titre, auteur, catégorie, langue, stock, bibliothèque de rattachement, description et
+            <strong>image de couverture</strong> (URL ou chemin vers un fichier dans <code>public/</code>, par ex.
+            <code>/images/covers/cover-1.svg</code>).
+        </p>
+        <form method="post" class="form-card" action="{{ book ? path('app_admin_book_edit', { id: book.id }) : path('app_admin_book_new') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
+            <p><label>Titre <input name="title" required class="input" value="{{ book ? book.title : '' }}"></label></p>
+            <p><label>Auteur <input name="author" required class="input" value="{{ book ? book.author : '' }}"></label></p>
+            <p><label>Catégorie <input name="category" required class="input" value="{{ book ? book.category : '' }}"></label></p>
+            <p><label>Langue <input name="language" required class="input" value="{{ book ? book.language : '' }}"></label></p>
+            <p><label>Stock <input name="stock" type="number" min="0" required class="input" value="{{ book ? book.stock : 1 }}"></label></p>
+            <p>
+                <label>Image de couverture (optionnel)
+                    <input name="cover_image_path" class="input" type="text" maxlength="512"
+                           placeholder="/images/covers/cover-1.svg"
+                           value="{{ book and book.coverImagePath ? book.coverImagePath : '' }}">
+                </label>
+            </p>
+            <p>
+                <label>Bibliothèque de rattachement
+                    <select name="library_id" class="input" required>
+                        {% for lib in libraries %}
+                            <option value="{{ lib.id }}" {{ book and book.library and book.library.id == lib.id ? 'selected' }}>
+                                {{ lib.name }}{% if lib.city %} — {{ lib.city }}{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </p>
+            <p><label>Description <textarea name="description" rows="6" class="input">{{ book and book.description ? book.description : '' }}</textarea></label></p>
+            <button type="submit" class="btn btn--primary">Enregistrer</button>
+        </form>
+        <p class="auth-page__footer"><a href="{{ path('app_librarian_dashboard') }}">Retour espace bibliothécaire</a></p>
+    </main>
+{% endblock %}

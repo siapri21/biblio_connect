@@ -26,21 +26,16 @@ class AdminBookController extends AbstractController
                 throw $this->createAccessDeniedException('Jeton CSRF invalide.');
             }
 
-            $library = $libraryRepository->find((int) $request->request->get('library_id'));
-            if ($library === null) {
-                $this->addFlash('danger', 'Bibliothèque de rattachement invalide.');
+            $book = new Book();
+            $error = $this->populateBookFromRequest($book, $request, $libraryRepository);
+            if ($error !== null) {
+                $this->addFlash('danger', $error);
 
-                return $this->render('admin/book_new.html.twig', ['libraries' => $libraries]);
+                return $this->render('admin/book_form.html.twig', [
+                    'libraries' => $libraries,
+                    'book' => $book,
+                ]);
             }
-
-            $book = (new Book())
-                ->setTitle((string) $request->request->get('title'))
-                ->setAuthor((string) $request->request->get('author'))
-                ->setCategory((string) $request->request->get('category'))
-                ->setLanguage((string) $request->request->get('language'))
-                ->setStock((int) $request->request->get('stock'))
-                ->setDescription($request->request->get('description') ? (string) $request->request->get('description') : null)
-                ->setLibrary($library);
 
             $em->persist($book);
             $em->flush();
@@ -48,7 +43,46 @@ class AdminBookController extends AbstractController
             return $this->redirectToRoute('app_book_show', ['id' => $book->getId()]);
         }
 
-        return $this->render('admin/book_new.html.twig', ['libraries' => $libraries]);
+        return $this->render('admin/book_form.html.twig', [
+            'libraries' => $libraries,
+            'book' => null,
+        ]);
+    }
+
+    #[Route('/ouvrage/{id}/modifier', name: 'app_admin_book_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function edit(int $id, Request $request, BookRepository $bookRepository, EntityManagerInterface $em, LibraryRepository $libraryRepository): Response
+    {
+        $book = $bookRepository->find($id);
+        if (!$book instanceof Book) {
+            throw $this->createNotFoundException();
+        }
+
+        $libraries = $libraryRepository->findAllOrderedByName();
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('submit', (string) $request->request->get('_token'))) {
+                throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+            }
+
+            $error = $this->populateBookFromRequest($book, $request, $libraryRepository);
+            if ($error !== null) {
+                $this->addFlash('danger', $error);
+
+                return $this->render('admin/book_form.html.twig', [
+                    'libraries' => $libraries,
+                    'book' => $book,
+                ]);
+            }
+
+            $em->flush();
+
+            return $this->redirectToRoute('app_book_show', ['id' => $book->getId()]);
+        }
+
+        return $this->render('admin/book_form.html.twig', [
+            'libraries' => $libraries,
+            'book' => $book,
+        ]);
     }
 
     #[Route('/ouvrages', name: 'app_admin_book_list', methods: ['GET'])]
@@ -57,5 +91,29 @@ class AdminBookController extends AbstractController
         return $this->render('admin/book_list.html.twig', [
             'books' => $books->findAll(),
         ]);
+    }
+
+    private function populateBookFromRequest(Book $book, Request $request, LibraryRepository $libraryRepository): ?string
+    {
+        $library = $libraryRepository->find((int) $request->request->get('library_id'));
+        if ($library === null) {
+            return 'Bibliothèque de rattachement invalide.';
+        }
+
+        $cover = trim((string) $request->request->get('cover_image_path'));
+        $desc = $request->request->get('description');
+        $desc = is_string($desc) && $desc !== '' ? $desc : null;
+
+        $book
+            ->setTitle(trim((string) $request->request->get('title')))
+            ->setAuthor(trim((string) $request->request->get('author')))
+            ->setCategory(trim((string) $request->request->get('category')))
+            ->setLanguage(trim((string) $request->request->get('language')))
+            ->setStock(max(0, (int) $request->request->get('stock')))
+            ->setDescription($desc)
+            ->setCoverImagePath($cover !== '' ? $cover : null)
+            ->setLibrary($library);
+
+        return null;
     }
 }

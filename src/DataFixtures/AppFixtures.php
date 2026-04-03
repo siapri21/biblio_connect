@@ -5,10 +5,16 @@ namespace App\DataFixtures;
 use App\Entity\Book;
 use App\Entity\Library;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class AppFixtures extends Fixture
+class AppFixtures extends Fixture implements DependentFixtureInterface
 {
+    public function getDependencies(): array
+    {
+        return [UserFixtures::class];
+    }
+
     public function load(ObjectManager $manager): void
     {
         $libraries = [

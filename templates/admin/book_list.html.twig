@@ -9,10 +9,17 @@
         <p><a href="{{ path('app_admin_book_new') }}" class="btn btn--primary">Nouvel ouvrage</a></p>
         <ul class="book-grid" style="margin-top:1rem;">
             {% for book in books %}
-                <li class="book-card">
+                <li class="book-card book-card--with-cover book-card--admin">
                     <a href="{{ path('app_book_show', { id: book.id }) }}" class="book-card__link">
-                        <span class="book-card__title">{{ book.title }}</span>
+                        {% include '_partials/_book_cover.html.twig' with { book: book } %}
+                        <div class="book-card__body">
+                            <span class="book-card__title">{{ book.title }}</span>
+                            <span class="book-card__author">{{ book.author }}</span>
+                        </div>
                     </a>
+                    <p class="book-card__admin-actions">
+                        <a href="{{ path('app_admin_book_edit', { id: book.id }) }}">Modifier la fiche</a>
+                    </p>
                 </li>
             {% else %}
                 <li class="book-card book-card--empty">Aucun ouvrage.</li>

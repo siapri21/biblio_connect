@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modération des avis — Biblio Connect{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container dashboard-page staff-reservations">
+        <p class="breadcrumb">
+            <a href="{{ path('app_admin_dashboard') }}">Administration</a>
+            · Modération des avis
+        </p>
+
+        {% for message in app.flashes('success') %}
+            <p class="flash flash--success">{{ message }}</p>
+        {% endfor %}
+
+        <h1 class="page-title">Modération des avis</h1>
+        <p class="text-muted staff-reservations__intro">
+            Les avis masqués ne s’affichent pas sur les fiches ouvrages. Les usagers ne voient pas ce panneau.
+        </p>
+
+        {% if reviews is empty %}
+            <p class="dashboard-card__empty">Aucun avis enregistré.</p>
+        {% else %}
+            <div class="staff-table-wrap">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Ouvrage</th>
+                            <th scope="col">Usager</th>
+                            <th scope="col">Note</th>
+                            <th scope="col">Commentaire</th>
+                            <th scope="col">Visibilité</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rev in reviews %}
+                            <tr>
+                                <td>{{ rev.createAd ? rev.createAd|date('d/m/Y H:i') : '—' }}</td>
+                                <td>
+                                    {% if rev.book %}
+                                        <a href="{{ path('app_book_show', { id: rev.book.id }) }}">{{ rev.book.title }}</a>
+                                    {% else %}—{% endif %}
+                                </td>
+                                <td>{{ rev.reservedBy ? rev.reservedBy.userIdentifier : '—' }}</td>
+                                <td>{{ rev.rating }} / 5</td>
+                                <td class="admin-review-comment">{{ rev.comment|length > 120 ? rev.comment|slice(0, 117) ~ '…' : rev.comment }}</td>
+                                <td>
+                                    {% if rev.isVisible %}
+                                        <span class="badge badge--ok">Publié</span>
+                                    {% else %}
+                                        <span class="badge badge--neutral">Masqué</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="post" action="{{ path('app_admin_review_toggle', { id: rev.id }) }}" class="inline-form">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('review_toggle_' ~ rev.id) }}">
+                                        <button type="submit" class="btn btn--secondary btn--small">
+                                            {% if rev.isVisible %}Masquer{% else %}Publier{% endif %}
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </main>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateurs et rôles — Biblio Connect{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container dashboard-page staff-reservations">
+        <p class="breadcrumb">
+            <a href="{{ path('app_admin_dashboard') }}">Administration</a>
+            · Utilisateurs
+        </p>
+
+        {% for message in app.flashes('success') %}
+            <p class="flash flash--success">{{ message }}</p>
+        {% endfor %}
+        {% for message in app.flashes('danger') %}
+            <p class="flash flash--error">{{ message }}</p>
+        {% endfor %}
+
+        <h1 class="page-title">Utilisateurs et rôles</h1>
+        <p class="text-muted staff-reservations__intro">
+            Chaque compte a un rôle principal : <strong>usager</strong> (catalogue et réservations),
+            <strong>bibliothécaire</strong> (gestion du catalogue et historique), ou <strong>administrateur</strong>
+            (modération, rôles, vue globale). Le dernier administrateur ne peut pas être rétrogradé.
+        </p>
+
+        {% if users is empty %}
+            <p class="dashboard-card__empty">Aucun utilisateur.</p>
+        {% else %}
+            <div class="staff-table-wrap">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">E-mail</th>
+                            <th scope="col">Rôle actuel</th>
+                            <th scope="col">Modifier</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                            <tr>
+                                <td>{{ u.userIdentifier }}</td>
+                                <td>
+                                    {% set pr = u.primaryStaffRole %}
+                                    {% if pr == 'admin' %}
+                                        <span class="badge badge--ok">Administrateur</span>
+                                    {% elseif pr == 'librarian' %}
+                                        <span class="badge badge--pending">Bibliothécaire</span>
+                                    {% else %}
+                                        <span class="badge badge--neutral">Usager</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="post" action="{{ path('app_admin_user_roles', { id: u.id }) }}" class="admin-user-role-form">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('user_roles_' ~ u.id) }}">
+                                        <label class="visually-hidden" for="role-{{ u.id }}">Rôle pour {{ u.userIdentifier }}</label>
+                                        <select name="primary_role" id="role-{{ u.id }}" class="input">
+                                            <option value="user" {{ pr == 'user' ? 'selected' }}>Usager</option>
+                                            <option value="librarian" {{ pr == 'librarian' ? 'selected' }}>Bibliothécaire</option>
+                                            <option value="admin" {{ pr == 'admin' ? 'selected' }}>Administrateur</option>
+                                        </select>
+                                        <button type="submit" class="btn btn--primary btn--small">Enregistrer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </main>
+{% endblock %}

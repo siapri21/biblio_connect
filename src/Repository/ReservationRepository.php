@@ -48,6 +48,16 @@ class ReservationRepository extends ServiceEntityRepository
     /**
      * Réservation encore en cours (en attente ou confirmée) pour cet usager et ce livre.
      */
+    public function countByStatus(string $status): int
+    {
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->andWhere('r.status = :s')
+            ->setParameter('s', $status)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function hasActiveReservationForMemberAndBook(User $member, Book $book): bool
     {
         $count = (int) $this->createQueryBuilder('r')
@@ -62,6 +72,27 @@ class ReservationRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         return $count > 0;
+    }
+
+    /**
+     * Historique complet pour le personnel (bibliothécaires / admins).
+     *
+     * @return Reservation[]
+     */
+    public function findAllForStaffOrdered(?string $status = null): array
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->leftJoin('r.member', 'm')->addSelect('m')
+            ->leftJoin('r.book', 'b')->addSelect('b')
+            ->leftJoin('b.library', 'l')->addSelect('l')
+            ->orderBy('r.createdAt', 'DESC')
+            ->addOrderBy('r.id', 'DESC');
+
+        if ($status !== null && $status !== '') {
+            $qb->andWhere('r.status = :st')->setParameter('st', $status);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
 //    /**
