@@ -5,7 +5,7 @@
 {% block body %}
     {% include '_partials/_nav.html.twig' %}
 
-    <main class="container auth-page auth-page--wide">
+    <main class="container auth-page auth-page--wide" id="main-content">
         {% for flash_error in app.flashes('verify_email_error') %}
             <div class="flash flash--error" role="alert">{{ flash_error }}</div>
         {% endfor %}
@@ -13,15 +13,14 @@
         <header class="auth-page__header-block">
             <h1 class="page-title">Créer un compte</h1>
             <div class="auth-register-notice" role="note">
-                <p class="auth-register-notice__title">Compte usager</p>
+                <p class="auth-register-notice__title">Compte lecteur</p>
                 <p>
-                    Ce formulaire crée un <strong>nouveau</strong> compte avec un <strong>nouvel e-mail</strong> (rôle usager uniquement).
-                    Les comptes <strong>bibliothécaire</strong> et <strong>administrateur</strong> ne s’obtiennent pas ici.
+                    Inscription réservée aux <strong>comptes usagers</strong> (consultation du catalogue, réservations, favoris).
+                    Les accès <strong>bibliothécaire</strong> et <strong>administrateur</strong> sont attribués par l’administration du réseau.
                 </p>
                 <p class="auth-register-notice__important">
-                    <strong>Important :</strong> si vous avez chargé les données de démo, les adresses comme
-                    <code>admin@biblio-connect.local</code> existent déjà — vous ne pouvez pas les « réinscrire ».
-                    Allez sur <a href="{{ path('app_login') }}">Connexion</a> et utilisez ce compte avec son mot de passe.
+                    <strong>Déjà inscrit ?</strong> Si votre adresse e-mail est déjà utilisée, utilisez
+                    <a href="{{ path('app_login') }}">Connexion</a> plutôt que de créer un second compte.
                 </p>
             </div>
         </header>

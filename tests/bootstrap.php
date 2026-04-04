@@ -1,4 +1,4 @@
-<?php
+&aq<?php
 
 use App\Kernel;
 use Doctrine\ORM\Tools\SchemaTool;

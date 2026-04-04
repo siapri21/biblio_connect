@@ -1,0 +1,54 @@
+{% extends 'site/_site_page_shell.html.twig' %}
+
+{% block title %}Aide — Biblio Connect{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Questions fréquentes : réservations, prolongations, liste d’attente et compte lecteur.">
+{% endblock %}
+
+{% block site_content %}
+    <header class="site-static-page__header">
+        <p class="site-static-page__eyebrow">Guide</p>
+        <h1 class="page-title">Aide &amp; FAQ</h1>
+    </header>
+
+    <div class="site-static-page__body prose-block help-page">
+        <h2>Créer un compte et se connecter</h2>
+        <p>
+            L’<a href="{{ path('app_register') }}">inscription</a> ouvre un compte <strong>lecteur</strong> (catalogue, favoris, réservations).
+            Les accès bibliothécaire et administrateur sont attribués par votre réseau, pas via le formulaire public.
+        </p>
+
+        <h2>Réserver un ouvrage</h2>
+        <p>
+            Sur la fiche livre, choisissez une <strong>date de retrait</strong> puis validez. La demande est <strong>en attente</strong> jusqu’à validation par la bibliothèque.
+            Vous suivez l’état dans <a href="{{ path('app_user_dashboard') }}">Mon espace</a>.
+        </p>
+
+        <h2>Liste d’attente</h2>
+        <p>
+            Si le stock est épuisé ou que tous les exemplaires sont déjà réservés, vous pouvez vous <strong>inscrire sur la liste d’attente</strong> depuis la fiche ouvrage.
+            Vous recevrez une indication de position ; pensez à vous désinscrire si vous n’en avez plus besoin.
+        </p>
+
+        <h2>Prolonger un prêt</h2>
+        <p>
+            Pour un prêt <strong>confirmé</strong>, une <strong>prolongation unique</strong> (14 jours) peut être demandée depuis Mon espace tant que la date de fin n’est pas passée.
+        </p>
+
+        <h2>Catalogue : filtres</h2>
+        <p>
+            Le <a href="{{ path('app_catalog') }}">catalogue</a> permet de combiner recherche texte, <strong>bibliothèque</strong>, <strong>disponibilité</strong> (exemplaire libre),
+            langue, catégorie, auteur et <strong>tri</strong> (titre ou auteur).
+        </p>
+
+        <h2>Accessibilité</h2>
+        <p>
+            Un lien « Aller au contenu » est proposé en haut de page. Les images de couverture portent une alternative textuelle.
+            Utilisez <kbd>Tab</kbd> pour naviguer au clavier.
+        </p>
+
+        <h2>Autre question ?</h2>
+        <p><a href="{{ path('app_contact') }}">Contactez-nous</a>.</p>
+    </div>
+{% endblock %}

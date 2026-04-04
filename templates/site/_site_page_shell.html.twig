@@ -1,0 +1,9 @@
+{# Utilisé par les pages statiques : nav + contenu + footer via base #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container site-static-page site-page-shell" id="main-content">
+        {% block site_content %}{% endblock %}
+    </main>
+{% endblock %}

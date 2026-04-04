@@ -5,83 +5,50 @@
 {% block body %}
     {% include '_partials/_nav.html.twig' %}
 
-    <main class="container auth-page auth-page--wide">
-        <header class="auth-page__header-block">
-            <h1 class="page-title">Connexion</h1>
-            <p class="auth-page__lead">
-                Un seul formulaire pour tous les comptes. Si vous ouvrez une page « réservée » (par ex. <strong>/admin</strong>)
-                sans être connecté, vous arrivez ici : connectez-vous avec le compte correspondant à votre rôle.
-            </p>
-        </header>
-
-        <section class="auth-roles" aria-label="Qui se connecte ?">
-            <h2 class="auth-roles__heading">Selon votre profil</h2>
-            <div class="auth-roles__grid">
-                <article class="auth-role-card">
-                    <h3 class="auth-role-card__title">Usager</h3>
-                    <p class="auth-role-card__text">
-                        Réservations, favoris, avis. Pas de compte ?
-                        <a href="{{ path('app_register') }}">Inscription</a> (compte usager uniquement).
-                    </p>
-                </article>
-                <article class="auth-role-card">
-                    <h3 class="auth-role-card__title">Bibliothécaire</h3>
-                    <p class="auth-role-card__text">
-                        Gestion du catalogue et historique des réservations. L’accès est attribué par l’établissement
-                        (pas via l’inscription publique).
-                    </p>
-                </article>
-                <article class="auth-role-card auth-role-card--emphasis">
-                    <h3 class="auth-role-card__title">Administrateur</h3>
-                    <p class="auth-role-card__text">
-                        Vue d’ensemble et accès complet. Compte dédié, créé par l’administrateur système — pas d’auto-inscription.
-                    </p>
-                </article>
+    <main class="container auth-page auth-page--login" id="main-content">
+        <div class="auth-login-card">
+            <div class="auth-login-card__brand">
+                <a href="{{ path('app_home') }}" class="auth-login-card__logo-link">
+                    <img src="{{ asset('images/logo-biblio.svg') }}" alt="Biblio Connect" class="auth-login-card__logo" width="140" height="42" decoding="async">
+                </a>
+                <h1 class="auth-login-card__title">Connexion</h1>
+                <p class="auth-login-card__subtitle">Saisissez l’adresse e-mail et le mot de passe de votre compte.</p>
             </div>
-        </section>
 
-        {% if from_action == 'reserve' %}
-            <p class="flash flash--info">Connectez-vous pour <strong>réserver</strong> cet ouvrage.</p>
-        {% elseif from_action == 'favorite' %}
-            <p class="flash flash--info">Connectez-vous pour ajouter ce livre à vos <strong>favoris</strong>.</p>
-        {% endif %}
-
-        {% if error %}
-            <p class="flash flash--error">{{ error.messageKey|trans(error.messageData, 'security') }}</p>
-        {% endif %}
-        {% if app.environment == 'dev' %}
-            <details class="auth-page__dev-hint">
-                <summary>Comptes de démonstration (après <code>doctrine:fixtures:load</code>)</summary>
-                <ul>
-                    <li><strong>Admin :</strong> admin@biblio-connect.local / Admin!demo2026</li>
-                    <li><strong>Bibliothécaire :</strong> bibliothecaire@biblio-connect.local / Biblio!demo2026</li>
-                    <li><strong>Usager :</strong> usager@biblio-connect.local / User!demo2026</li>
-                </ul>
-            </details>
-        {% endif %}
-
-        <form method="post" action="{{ path('app_login') }}" class="form-card auth-form">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-            {% if redirect_target %}
-                <input type="hidden" name="_target_path" value="{{ redirect_target }}">
+            {% if from_action == 'reserve' %}
+                <p class="flash flash--info">Connectez-vous pour <strong>réserver</strong> cet ouvrage.</p>
+            {% elseif from_action == 'favorite' %}
+                <p class="flash flash--info">Connectez-vous pour ajouter ce livre à vos <strong>favoris</strong>.</p>
             {% endif %}
-            <p>
-                <label for="username">E-mail</label>
-                <input type="email" id="username" name="_username" value="{{ last_username }}" required autofocus class="input">
+
+            {% if error %}
+                <p class="flash flash--error" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</p>
+            {% endif %}
+
+            <form method="post" action="{{ path('app_login') }}" class="form-card auth-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                {% if redirect_target %}
+                    <input type="hidden" name="_target_path" value="{{ redirect_target }}">
+                {% endif %}
+                <p>
+                    <label for="username">E-mail</label>
+                    <input type="email" id="username" name="_username" value="{{ last_username }}" required autofocus class="input" autocomplete="email">
+                </p>
+                <p>
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="_password" required class="input" autocomplete="current-password">
+                </p>
+                <button type="submit" class="btn btn--primary btn--block">Se connecter</button>
+            </form>
+
+            <p class="auth-page__footer auth-login-card__footer">
+                <a href="{{ path('app_home') }}">Accueil</a>
+                <span class="auth-login-card__sep">·</span>
+                {% set register_params = {} %}
+                {% if redirect_target %}{% set register_params = register_params|merge({ redirect: redirect_target }) %}{% endif %}
+                {% if from_action %}{% set register_params = register_params|merge({ from: from_action }) %}{% endif %}
+                <a href="{{ path('app_register', register_params) }}">Créer un compte</a>
             </p>
-            <p>
-                <label for="password">Mot de passe</label>
-                <input type="password" id="password" name="_password" required class="input" autocomplete="current-password">
-            </p>
-            <button type="submit" class="btn btn--primary btn--block">Se connecter</button>
-        </form>
-        <p class="auth-page__footer">
-            <a href="{{ path('app_home') }}">← Accueil</a>
-            ·
-            {% set register_params = {} %}
-            {% if redirect_target %}{% set register_params = register_params|merge({ redirect: redirect_target }) %}{% endif %}
-            {% if from_action %}{% set register_params = register_params|merge({ from: from_action }) %}{% endif %}
-            <a href="{{ path('app_register', register_params) }}">Créer un compte usager</a>
-        </p>
+        </div>
     </main>
 {% endblock %}

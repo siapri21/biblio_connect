@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\ActivityLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +25,7 @@ class AdminUserController extends AbstractController
     }
 
     #[Route('/{id}/roles', name: 'app_admin_user_roles', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function updateRoles(int $id, Request $request, UserRepository $userRepository, EntityManagerInterface $em): Response
+    public function updateRoles(int $id, Request $request, UserRepository $userRepository, EntityManagerInterface $em, ActivityLogger $activityLogger): Response
     {
         $user = $userRepository->find($id);
         if (!$user instanceof User) {
@@ -52,6 +53,16 @@ class AdminUserController extends AbstractController
         }
 
         $user->setRoles($newRoles);
+        $em->flush();
+
+        $actor = $this->getUser();
+        $activityLogger->log(
+            $actor instanceof User ? $actor : null,
+            'user.roles_update',
+            'User',
+            $user->getId(),
+            implode(',', $newRoles),
+        );
         $em->flush();
 
         $this->addFlash('success', 'Rôle mis à jour pour '.$user->getUserIdentifier().'.');

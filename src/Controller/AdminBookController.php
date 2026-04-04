@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use App\Entity\User;
 use App\Repository\BookRepository;
 use App\Repository\LibraryRepository;
+use App\Service\ActivityLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class AdminBookController extends AbstractController
 {
     #[Route('/ouvrage/nouveau', name: 'app_admin_book_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, LibraryRepository $libraryRepository): Response
+    public function new(Request $request, EntityManagerInterface $em, LibraryRepository $libraryRepository, ActivityLogger $activityLogger): Response
     {
         $libraries = $libraryRepository->findAllOrderedByName();
 
@@ -40,6 +42,10 @@ class AdminBookController extends AbstractController
             $em->persist($book);
             $em->flush();
 
+            $u = $this->getUser();
+            $activityLogger->log($u instanceof User ? $u : null, 'book.create', 'Book', $book->getId(), $book->getTitle());
+            $em->flush();
+
             return $this->redirectToRoute('app_book_show', ['id' => $book->getId()]);
         }
 
@@ -50,7 +56,7 @@ class AdminBookController extends AbstractController
     }
 
     #[Route('/ouvrage/{id}/modifier', name: 'app_admin_book_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function edit(int $id, Request $request, BookRepository $bookRepository, EntityManagerInterface $em, LibraryRepository $libraryRepository): Response
+    public function edit(int $id, Request $request, BookRepository $bookRepository, EntityManagerInterface $em, LibraryRepository $libraryRepository, ActivityLogger $activityLogger): Response
     {
         $book = $bookRepository->find($id);
         if (!$book instanceof Book) {
@@ -74,6 +80,10 @@ class AdminBookController extends AbstractController
                 ]);
             }
 
+            $em->flush();
+
+            $u = $this->getUser();
+            $activityLogger->log($u instanceof User ? $u : null, 'book.update', 'Book', $book->getId(), $book->getTitle());
             $em->flush();
 
             return $this->redirectToRoute('app_book_show', ['id' => $book->getId()]);

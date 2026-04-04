@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\ReviewRepository;
+use App\Service\ActivityLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +25,7 @@ class AdminReviewController extends AbstractController
     }
 
     #[Route('/avis/{id}/visibilite', name: 'app_admin_review_toggle', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function toggleVisibility(int $id, Request $request, ReviewRepository $reviewRepository, EntityManagerInterface $em): Response
+    public function toggleVisibility(int $id, Request $request, ReviewRepository $reviewRepository, EntityManagerInterface $em, ActivityLogger $activityLogger): Response
     {
         $review = $reviewRepository->find($id);
         if ($review === null) {
@@ -36,6 +38,16 @@ class AdminReviewController extends AbstractController
 
         $visible = $review->isVisible() ?? false;
         $review->setIsVisible(!$visible);
+        $em->flush();
+
+        $actor = $this->getUser();
+        $activityLogger->log(
+            $actor instanceof User ? $actor : null,
+            'review.visibility_toggle',
+            'Review',
+            $review->getId(),
+            $review->isVisible() ? 'visible' : 'hidden',
+        );
         $em->flush();
 
         $this->addFlash('success', $review->isVisible() ? 'L’avis est maintenant visible sur la fiche ouvrage.' : 'L’avis est masqué.');

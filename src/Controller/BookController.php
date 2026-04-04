@@ -8,6 +8,7 @@ use App\Entity\Reservation;
 use App\Entity\Review;
 use App\Entity\User;
 use App\Form\ReviewFormType;
+use App\Repository\BookWaitlistRepository;
 use App\Repository\FavoriteRepository;
 use App\Repository\ReservationRepository;
 use App\Repository\ReviewRepository;
@@ -30,17 +31,27 @@ class BookController extends AbstractController
         FavoriteRepository $favoriteRepository,
         ReviewRepository $reviewRepository,
         ReservationRepository $reservationRepository,
+        BookWaitlistRepository $bookWaitlistRepository,
     ): Response {
         $user = $this->getUser();
         $isFavorite = false;
         $userReview = null;
         $reviewForm = null;
         $userHasActiveReservation = false;
+        $userWaitlistEntry = null;
+        $waitlistTotal = 0;
+        $canJoinWaitlist = false;
+        $waitlistTotal = $bookWaitlistRepository->countByBook($book);
 
         if ($user instanceof User) {
             $isFavorite = null !== $favoriteRepository->findOneByMemberAndBook($user, $book);
             $userReview = $reviewRepository->findOneByUserAndBook($user, $book);
             $userHasActiveReservation = $reservationRepository->hasActiveReservationForMemberAndBook($user, $book);
+            $userWaitlistEntry = $bookWaitlistRepository->findOneByMemberAndBook($user, $book);
+            $activeRes = $reservationRepository->countActiveForBook($book);
+            $canJoinWaitlist = !$userHasActiveReservation
+                && $userWaitlistEntry === null
+                && ($book->getStock() < 1 || $activeRes >= $book->getStock());
             if ($userReview === null) {
                 $reviewForm = $this->createForm(ReviewFormType::class)->createView();
             }
@@ -72,6 +83,9 @@ class BookController extends AbstractController
             'userHasActiveReservation' => $userHasActiveReservation,
             'reservationMinDate' => $today->format('Y-m-d'),
             'reservationMaxDate' => $maxDate->format('Y-m-d'),
+            'userWaitlistEntry' => $userWaitlistEntry,
+            'waitlistTotal' => $waitlistTotal,
+            'canJoinWaitlist' => $canJoinWaitlist,
         ]);
     }
 
@@ -176,7 +190,7 @@ class BookController extends AbstractController
         $libLabel = $book->getLibrary()?->getLabel() ?? 'la bibliothèque de rattachement';
         $this->addFlash(
             'success',
-            'Réservation enregistrée. Retrait prévu à '.$libLabel.' à partir du '.$pickup->format('d/m/Y').' (prêt de '.self::LOAN_DAYS.' jours).',
+            'Demande enregistrée : elle doit être validée par la bibliothèque. Retrait prévu à '.$libLabel.' à partir du '.$pickup->format('d/m/Y').' (prêt de '.self::LOAN_DAYS.' jours) une fois acceptée.',
         );
 
         return $this->redirectToRoute('app_book_show', ['id' => $book->getId()]);
@@ -216,7 +230,7 @@ class BookController extends AbstractController
             ->setRating((int) $data['rating'])
             ->setComment((string) $data['comment'])
             ->setIsVisible(true)
-            ->setCreateAd(new \DateTimeImmutable());
+            ->setCreatedAt(new \DateTimeImmutable());
 
         $em->persist($review);
         $em->flush();

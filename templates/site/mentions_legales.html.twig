@@ -1,0 +1,42 @@
+{% extends 'site/_site_page_shell.html.twig' %}
+
+{% block title %}Mentions légales — Biblio Connect{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Mentions légales du site Biblio Connect — éditeur, hébergement et propriété intellectuelle.">
+{% endblock %}
+
+{% block site_content %}
+    <header class="site-static-page__header">
+        <p class="site-static-page__eyebrow">Informations</p>
+        <h1 class="page-title">Mentions légales</h1>
+    </header>
+
+    <div class="site-static-page__body prose-block">
+        <h2>Édition du site</h2>
+        <p>
+            Le site <strong>Biblio Connect</strong> présente les services de prêt et de consultation du réseau.
+            Les mentions d’identification complètes (raison sociale, SIREN, etc.) peuvent être complétées selon votre structure.
+        </p>
+
+        <h2>Directeur de la publication</h2>
+        <p>À renseigner conformément à la politique de votre établissement ou organisme.</p>
+
+        <h2>Hébergement</h2>
+        <p>
+            Indiquez ici le nom, l’adresse et les coordonnées de l’hébergeur en production, conformément aux obligations légales.
+        </p>
+
+        <h2>Propriété intellectuelle</h2>
+        <p>
+            Les éléments graphiques, textes et code propres au site relèvent de leurs auteurs respectifs.
+            Les couvertures d’ouvrages sont affichées à partir de sources publiques (notamment Open Library) lorsque disponibles.
+        </p>
+
+        <h2>Limitation de responsabilité</h2>
+        <p>
+            Les informations du catalogue et les disponibilités sont fournies sous réserve de mise à jour effective en bibliothèque.
+            Pour toute question, utilisez la page <a href="{{ path('app_contact') }}">Contact</a>.
+        </p>
+    </div>
+{% endblock %}

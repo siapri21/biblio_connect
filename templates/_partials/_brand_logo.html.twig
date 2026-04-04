@@ -1,0 +1,4 @@
+{# Logo + titre — réutilisable (nav, login) #}
+<a href="{{ path('app_home') }}" class="site-nav__brand brand-logo" {% if nav_aria_label is defined %}aria-label="{{ nav_aria_label }}"{% endif %}>
+    <img src="{{ asset('images/logo-biblio.svg') }}" alt="" class="brand-logo__mark" width="120" height="36" decoding="async">
+</a>

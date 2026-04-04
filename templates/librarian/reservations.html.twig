@@ -4,11 +4,18 @@
 
 {% block body %}
     {% include '_partials/_nav.html.twig' %}
-    <main class="container dashboard-page staff-reservations">
+    <main class="container dashboard-page staff-reservations" id="main-content">
         <p class="breadcrumb">
             <a href="{{ path('app_librarian_dashboard') }}">Espace bibliothécaire</a>
             · Historique des réservations
         </p>
+
+        {% for message in app.flashes('success') %}
+            <p class="flash flash--success">{{ message }}</p>
+        {% endfor %}
+        {% for message in app.flashes('info') %}
+            <p class="flash flash--info">{{ message }}</p>
+        {% endfor %}
 
         <h1 class="page-title">
             {% if filterStatus == 'pending' %}
@@ -19,9 +26,9 @@
         </h1>
         <p class="text-muted staff-reservations__intro">
             {% if filterStatus == 'pending' %}
-                Demandes à traiter (statut « en attente »), les plus récentes en premier.
+                Validez ou refusez chaque demande. Les usagers voient le statut dans <strong>Mon espace</strong>.
             {% else %}
-                Toutes les réservations enregistrées (tous les usagers), triées par date de demande.
+                Toutes les réservations (tous les usagers), triées par date de demande. Les demandes en attente peuvent être traitées depuis le filtre ci-dessous.
             {% endif %}
         </p>
 
@@ -46,6 +53,7 @@
                             <th scope="col">Bibliothèque</th>
                             <th scope="col">Période de prêt</th>
                             <th scope="col">Statut</th>
+                            <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,6 +85,28 @@
                                         {% elseif r.status == 'completed' %}Terminée
                                         {% else %}{{ r.status }}{% endif %}
                                     </span>
+                                </td>
+                                <td class="staff-table__actions">
+                                    {% if r.status == 'pending' %}
+                                        <form method="post" action="{{ path('app_staff_reservation_confirm', { id: r.id }) }}" class="staff-action-form">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('staff_confirm_' ~ r.id) }}">
+                                            <input type="hidden" name="_back" value="{{ filterStatus == 'pending' ? 'pending' : '' }}">
+                                            <button type="submit" class="btn btn--primary btn--small">Valider</button>
+                                        </form>
+                                        <form method="post" action="{{ path('app_staff_reservation_reject', { id: r.id }) }}" class="staff-action-form">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('staff_reject_' ~ r.id) }}">
+                                            <input type="hidden" name="_back" value="{{ filterStatus == 'pending' ? 'pending' : '' }}">
+                                            <button type="submit" class="btn btn--secondary btn--small">Refuser</button>
+                                        </form>
+                                    {% elseif r.status == 'confirmed' %}
+                                        <form method="post" action="{{ path('app_staff_reservation_complete', { id: r.id }) }}" class="staff-action-form" data-confirm="Marquer le retour comme enregistré ?">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('staff_complete_' ~ r.id) }}">
+                                            <input type="hidden" name="_back" value="{{ filterStatus == 'pending' ? 'pending' : '' }}">
+                                            <button type="submit" class="btn btn--primary btn--small">Clôturer (retour)</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}

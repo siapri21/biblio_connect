@@ -1,88 +1,220 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Biblio Connect — Votre bibliothèque en ligne{% endblock %}
+{% block title %}Biblio Connect — Découvrez votre prochain livre{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Biblio Connect : catalogue, réservations et avis. Trouvez un livre par catégorie, auteur ou langue.">
+{% endblock %}
 
 {% block body %}
     {% include '_partials/_nav.html.twig' %}
 
-    <header class="hero">
-        <div class="hero__inner container">
-            <p class="hero__eyebrow">Plateforme de gestion de bibliothèque</p>
-            <h1 class="hero__title">Lisez, réservez, partagez vos coups de cœur.</h1>
-            <p class="hero__lead">
-                Biblio Connect réunit usagers, bibliothécaires et administration : catalogue,
-                réservations, favoris et avis — tout au même endroit.
-            </p>
-            <div class="hero__actions">
-                <a href="{{ path('app_catalog') }}" class="btn btn--primary">Parcourir le catalogue</a>
-                {% if not app.user %}
-                    <a href="{{ path('app_register') }}" class="btn btn--ghost">Créer un compte</a>
-                {% endif %}
+    <main id="main-content">
+    <section class="landing-hero">
+        <div class="container landing-hero__grid">
+            <div class="landing-hero__text">
+                <p class="landing-hero__kicker">Bibliothèque en ligne</p>
+                <h1 class="landing-hero__title">Découvrez votre prochain livre préféré</h1>
+                <p class="landing-hero__lead">
+                    Parcourez des milliers d’ouvrages, réservez en quelques clics et partagez vos avis.
+                    Une expérience simple pour les lecteurs, puissante pour les équipes.
+                </p>
+                <div class="landing-hero__cta">
+                    <a href="{{ path('app_catalog') }}" class="btn btn--landing-primary">Explorer le catalogue</a>
+                    {% if not app.user %}
+                        <a href="{{ path('app_login') }}" class="btn btn--landing-outline">Se connecter</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="landing-hero__media">
+                <div class="landing-hero__photo-wrap">
+                    <img
+                        src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=720&q=85"
+                        alt=""
+                        class="landing-hero__photo"
+                        width="720"
+                        height="480"
+                        loading="eager"
+                        decoding="async"
+                    >
+                </div>
             </div>
         </div>
-    </header>
+    </section>
+
+    <section class="landing-filter" id="trouver-livre" aria-labelledby="landing-filter-title">
+        <div class="container">
+            <h2 id="landing-filter-title" class="landing-filter__title">Trouvez un livre qui vous plaît</h2>
+            <form class="landing-filter__form" method="get" action="{{ path('app_catalog') }}">
+                <div class="landing-filter__fields">
+                    <label class="landing-filter__field">
+                        <span class="landing-filter__label">Catégorie</span>
+                        <select name="category" class="landing-filter__select">
+                            <option value="">Toutes</option>
+                            {% for c in filterCategories %}
+                                <option value="{{ c }}">{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label class="landing-filter__field">
+                        <span class="landing-filter__label">Auteur</span>
+                        <select name="author" class="landing-filter__select">
+                            <option value="">Tous</option>
+                            {% for a in filterAuthors %}
+                                <option value="{{ a }}">{{ a }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label class="landing-filter__field">
+                        <span class="landing-filter__label">Langue</span>
+                        <select name="language" class="landing-filter__select">
+                            <option value="">Toutes</option>
+                            {% for lang in filterLanguages %}
+                                <option value="{{ lang }}">{{ lang }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label class="landing-filter__field landing-filter__field--grow">
+                        <span class="landing-filter__label">Mot-clé (titre…)</span>
+                        <input type="search" name="q" class="landing-filter__input" placeholder="Ex. fantasy, roman…" maxlength="200" autocomplete="off">
+                    </label>
+                </div>
+                <button type="submit" class="btn btn--landing-primary landing-filter__submit">Rechercher</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="landing-stats-bar" aria-label="Chiffres">
+        <div class="container landing-stats-bar__inner">
+            <div class="landing-stats-bar__item">
+                <strong>{{ statBookCount }}</strong>
+                <span>ouvrages</span>
+            </div>
+            <div class="landing-stats-bar__item">
+                <strong>{{ statCategoryCount }}</strong>
+                <span>catégories</span>
+            </div>
+            <div class="landing-stats-bar__item">
+                <strong>3</strong>
+                <span>bibliothèques</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="landing-carousel-section" id="top-readings" aria-labelledby="carousel-title">
+        <div class="container">
+            <div class="landing-section-head">
+                <h2 id="carousel-title" class="landing-section-head__title">Vos lectures du moment</h2>
+                <p class="landing-section-head__lead">Sélection récente du catalogue — notes basées sur les avis des lecteurs.</p>
+            </div>
+            {% if carouselBooks is not empty %}
+                <div class="landing-carousel" data-controller="landing-carousel">
+                    <button type="button" class="landing-carousel__arrow landing-carousel__arrow--prev" data-action="landing-carousel#prev" aria-label="Faire défiler vers la gauche">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    <div class="landing-carousel__viewport" data-landing-carousel-target="scroller">
+                        <ul class="landing-carousel__list">
+                            {% for item in carouselBooks %}
+                                {% set book = item.book %}
+                                {% set avg = item.avgRating %}
+                                <li class="landing-carousel__item">
+                                    <article class="landing-book-card">
+                                        <a href="{{ path('app_book_show', { id: book.id }) }}" class="landing-book-card__cover-link">
+                                            {% include '_partials/_book_cover.html.twig' with { book: book, variant: 'card' } %}
+                                        </a>
+                                        <div class="landing-book-card__body">
+                                            <a href="{{ path('app_book_show', { id: book.id }) }}" class="landing-book-card__title">{{ book.title }}</a>
+                                            <p class="landing-book-card__author">{{ book.author }}</p>
+                                            <div class="landing-book-card__stars" aria-label="{% if avg %}Note moyenne {{ avg|number_format(1, ',', ' ') }} sur 5{% else %}Pas encore noté{% endif %}">
+                                                {% if avg is not null %}
+                                                    {% set full = (avg|round(0, 'floor')) %}
+                                                    {% for i in 1..5 %}
+                                                        <span class="landing-star {{ i <= full ? 'landing-star--on' : '' }}" aria-hidden="true">★</span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="landing-book-card__norating">Pas encore d’avis</span>
+                                                {% endif %}
+                                            </div>
+                                            <a href="{{ path('app_book_show', { id: book.id }) }}" class="landing-book-card__more">Voir la fiche →</a>
+                                        </div>
+                                    </article>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <button type="button" class="landing-carousel__arrow landing-carousel__arrow--next" data-action="landing-carousel#next" aria-label="Faire défiler vers la droite">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </section>
 
     {% if highlightBooks is not empty %}
-        <section class="section section--books">
+        <section class="landing-grid-books">
             <div class="container">
-                <h2 class="section-title">En librairie</h2>
-                <p class="section-lead">Un aperçu des derniers ouvrages ajoutés au catalogue.</p>
+                <h2 class="landing-section-head__title">Nouveautés</h2>
                 <ul class="book-grid book-grid--landing">
                     {% for book in highlightBooks %}
-                        <li class="book-card book-card--with-cover">
+                        <li class="book-card book-card--with-cover book-card--landing">
                             <a href="{{ path('app_book_show', { id: book.id }) }}" class="book-card__link">
                                 {% include '_partials/_book_cover.html.twig' with { book: book } %}
                                 <div class="book-card__body">
                                     <span class="book-card__title">{{ book.title }}</span>
                                     <span class="book-card__author">{{ book.author }}</span>
+                                    <span class="book-card__cat">{{ book.category }}</span>
                                 </div>
                             </a>
                         </li>
                     {% endfor %}
                 </ul>
-                <p class="section-cta">
-                    <a href="{{ path('app_catalog') }}" class="btn btn--secondary">Voir tout le catalogue</a>
+                <p class="landing-grid-books__cta">
+                    <a href="{{ path('app_catalog') }}" class="btn btn--landing-outline">Tout le catalogue</a>
                 </p>
             </div>
         </section>
     {% endif %}
 
-    <section class="section section--alt">
-        <div class="container grid-features">
-            <article class="feature">
-                <h2 class="feature__title">Espace usager</h2>
-                <p>Inscription, connexion, favoris, réservations et avis sur les livres lus.</p>
-            </article>
-            <article class="feature">
-                <h2 class="feature__title">Bibliothécaires</h2>
-                <p>Gestion du catalogue, fiches détaillées et suivi des réservations.</p>
-            </article>
-            <article class="feature">
-                <h2 class="feature__title">Administration</h2>
-                <p>Stocks, modération des commentaires et gestion des rôles et profils.</p>
-            </article>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="container cta-block">
-            <h2 class="cta-block__title">Prêt à commencer ?</h2>
-            <p class="cta-block__text">Découvrez les ouvrages disponibles ou connectez-vous à votre espace.</p>
-            <div class="hero__actions">
-                <a href="{{ path('app_catalog') }}" class="btn btn--primary">Voir le catalogue</a>
-                {% if not app.user %}
-                    <a href="{{ path('app_login') }}" class="btn btn--secondary">Se connecter</a>
-                {% else %}
-                    <a href="{{ path('app_user_dashboard') }}" class="btn btn--secondary">Mon espace</a>
-                {% endif %}
+    <section class="landing-featured" aria-labelledby="featured-title">
+        <div class="container">
+            <h2 id="featured-title" class="visually-hidden">À la une</h2>
+            <div class="landing-featured__grid">
+                <article class="landing-feature-card landing-feature-card--navy">
+                    <h3 class="landing-feature-card__title">Votre parcours commence ici</h3>
+                    <p class="landing-feature-card__text">Créez un compte usager pour réserver, noter vos lectures et garder vos favoris.</p>
+                    <a href="{{ path('app_register') }}" class="landing-feature-card__link">Créer un compte →</a>
+                </article>
+                <article class="landing-feature-card landing-feature-card--coral">
+                    <h3 class="landing-feature-card__title">Adhésion & prêts</h3>
+                    <p class="landing-feature-card__text">Retraits en bibliothèque partenaire, durée de prêt claire et suivi dans votre espace.</p>
+                    <a href="{{ path('app_catalog') }}" class="landing-feature-card__link">Voir le catalogue →</a>
+                </article>
+                <article class="landing-feature-card landing-feature-card--mint">
+                    <h3 class="landing-feature-card__title">Pour les équipes</h3>
+                    <p class="landing-feature-card__text">Outils pour bibliothécaires et administration : validation des réservations, modération.</p>
+                    <a href="{{ path('app_login') }}" class="landing-feature-card__link">Espace pro →</a>
+                </article>
             </div>
         </div>
     </section>
 
-    <footer class="site-footer">
-        <div class="container site-footer__inner">
-            <span class="site-footer__brand">Biblio Connect</span>
-            <span class="site-footer__meta">Projet Symfony — rôles : usager, bibliothécaire, administrateur.</span>
+    <section class="landing-newsletter">
+        <div class="landing-newsletter__strip">
+            <div class="container landing-newsletter__strip-inner">
+                <p class="landing-newsletter__strip-text">Envie de nouvelles recommandations ?</p>
+            </div>
         </div>
-    </footer>
+        <div class="landing-newsletter__panel">
+            <div class="container landing-newsletter__panel-inner">
+                <div class="landing-newsletter__copy">
+                    <h2 class="landing-newsletter__heading">Restez informé des nouveautés</h2>
+                    <p class="landing-newsletter__sub">Créez un compte pour suivre vos prêts et découvrir les prochains titres.</p>
+                </div>
+                <div class="landing-newsletter__action">
+                    <a href="{{ path('app_register') }}" class="btn btn--landing-primary btn--landing-lg">Créer un compte gratuit</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    </main>
 {% endblock %}

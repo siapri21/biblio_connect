@@ -27,7 +27,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->andWhere('r.book = :b')
             ->andWhere('r.isVisible = true')
             ->setParameter('b', $book)
-            ->orderBy('r.createAd', 'DESC')
+            ->orderBy('r.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
@@ -46,7 +46,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->leftJoin('r.book', 'b')->addSelect('b')
             ->andWhere('r.reservedBy = :u')
             ->setParameter('u', $member)
-            ->orderBy('r.createAd', 'DESC')
+            ->orderBy('r.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
@@ -70,7 +70,7 @@ class ReviewRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('r')
             ->leftJoin('r.book', 'b')->addSelect('b')
             ->leftJoin('r.reservedBy', 'u')->addSelect('u')
-            ->orderBy('r.createAd', 'DESC')
+            ->orderBy('r.createdAt', 'DESC')
             ->addOrderBy('r.id', 'DESC')
             ->getQuery()
             ->getResult();
@@ -87,6 +87,17 @@ class ReviewRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         return $result !== null ? (float) $result : null;
+    }
+
+    public function countVisibleForBook(Book $book): int
+    {
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->andWhere('r.book = :b')
+            ->andWhere('r.isVisible = true')
+            ->setParameter('b', $book)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     //    /**

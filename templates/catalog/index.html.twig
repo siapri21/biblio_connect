@@ -4,16 +4,86 @@
 
 {% block body %}
     {% include '_partials/_nav.html.twig' %}
-    <main class="container page-catalog">
+    <main class="container page-catalog" id="main-content">
         <h1 class="page-title">Catalogue</h1>
+
+        {% set fc = filterCategory|default('') %}
+        {% set fa = filterAuthor|default('') %}
+        {% set fl = filterLanguage|default('') %}
+        {% set flib = filterLibraryId|default(0) %}
+        {% set fav = filterAvailableOnly|default(false) %}
+        {% set sort = sort|default('title_asc') %}
+        {% set hasFilters = fc|trim != '' or fa|trim != '' or fl|trim != '' or flib > 0 or fav or sort != 'title_asc' %}
+
         {% if searchQuery is defined and searchQuery|trim != '' %}
             <p class="catalog-intro">
                 Résultats pour « <strong>{{ searchQuery|e }}</strong> »
                 — <a href="{{ path('app_catalog') }}">tout afficher</a>
             </p>
+        {% elseif hasFilters %}
+            <p class="catalog-intro">
+                Filtres actifs
+                {% if fc|trim != '' %} · <strong>{{ fc|e }}</strong>{% endif %}
+                {% if fa|trim != '' %} · <strong>{{ fa|e }}</strong>{% endif %}
+                {% if fl|trim != '' %} · langue <strong>{{ fl|e }}</strong>{% endif %}
+                {% if flib > 0 %} · bibliothèque{% endif %}
+                {% if fav %} · <strong>disponible</strong>{% endif %}
+                — <a href="{{ path('app_catalog') }}">réinitialiser</a>
+            </p>
         {% else %}
-            <p class="text-muted catalog-intro">Recherchez par titre, auteur ou catégorie (barre ci-dessus ou raccourci catalogue).</p>
+            <p class="text-muted catalog-intro">Recherchez par titre, auteur ou catégorie ; affinez avec les filtres ci-dessous.</p>
         {% endif %}
+
+        <section class="catalog-filters" aria-label="Filtres du catalogue">
+            <form class="catalog-filters__form" method="get" action="{{ path('app_catalog') }}">
+                {% if searchQuery is defined and searchQuery|trim != '' %}
+                    <input type="hidden" name="q" value="{{ searchQuery|e('html_attr') }}">
+                {% endif %}
+                <div class="catalog-filters__row">
+                    <p class="catalog-filters__field">
+                        <label for="filter-library">Bibliothèque</label>
+                        <select id="filter-library" name="library" class="input">
+                            <option value="">Toutes</option>
+                            {% for lib in libraries %}
+                                <option value="{{ lib.id }}" {{ flib == lib.id ? 'selected' }}>{{ lib.name }}{% if lib.city %} — {{ lib.city }}{% endif %}</option>
+                            {% endfor %}
+                        </select>
+                    </p>
+                    <p class="catalog-filters__field">
+                        <label for="filter-cat">Catégorie</label>
+                        <input type="text" id="filter-cat" name="category" class="input" value="{{ fc|e('html_attr') }}" placeholder="ex. Roman" maxlength="120" list="catalog-categories">
+                        <datalist id="catalog-categories">
+                            {% for c in categories|default([]) %}
+                                <option value="{{ c|e('html_attr') }}">
+                            {% endfor %}
+                        </datalist>
+                    </p>
+                    <p class="catalog-filters__field">
+                        <label for="filter-lang">Langue (code)</label>
+                        <input type="text" id="filter-lang" name="language" class="input" value="{{ fl|e('html_attr') }}" placeholder="fr, en…" maxlength="8">
+                    </p>
+                    <p class="catalog-filters__field catalog-filters__field--checkbox">
+                        <label>
+                            <input type="checkbox" name="available" value="1" {{ fav ? 'checked' }}>
+                            Exemplaire disponible
+                        </label>
+                    </p>
+                    <p class="catalog-filters__field">
+                        <label for="filter-sort">Tri</label>
+                        <select id="filter-sort" name="sort" class="input">
+                            <option value="title_asc" {{ sort == 'title_asc' ? 'selected' }}>Titre (A→Z)</option>
+                            <option value="title_desc" {{ sort == 'title_desc' ? 'selected' }}>Titre (Z→A)</option>
+                            <option value="author_asc" {{ sort == 'author_asc' ? 'selected' }}>Auteur (A→Z)</option>
+                            <option value="author_desc" {{ sort == 'author_desc' ? 'selected' }}>Auteur (Z→A)</option>
+                        </select>
+                    </p>
+                    <p class="catalog-filters__actions">
+                        <button type="submit" class="btn btn--primary">Appliquer</button>
+                    </p>
+                </div>
+            </form>
+        </section>
+
         <ul class="book-grid">
             {% for book in books %}
                 <li class="book-card book-card--with-cover">
@@ -30,7 +100,7 @@
                     {% if searchQuery is defined and searchQuery|trim != '' %}
                         Aucun ouvrage ne correspond à votre recherche.
                     {% else %}
-                        Aucun ouvrage pour le moment.
+                        Aucun ouvrage pour ces critères.
                     {% endif %}
                 </li>
             {% endfor %}

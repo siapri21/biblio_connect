@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 36" fill="none" aria-hidden="true">
+  <rect x="2" y="4" width="26" height="28" rx="3" fill="#2d4a3e"/>
+  <path fill="#f5f2eb" d="M8 10h9c1.1 0 2 .9 2 2v16H9c-.6 0-1-.4-1-1V10z"/>
+  <path fill="#e8e4dc" d="M19 10h9v16c0 .6-.4 1-1 1h-10V12c0-1.1.9-2 2-2z"/>
+  <path stroke="#c4bfb4" stroke-width="0.8" d="M18 11v16"/>
+  <text x="36" y="25" fill="#1a1a1a" font-family="Georgia,serif" font-size="18" font-weight="700">Biblio Connect</text>
+</svg>

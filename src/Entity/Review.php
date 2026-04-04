@@ -29,8 +29,9 @@ class Review
     #[ORM\Column]
     private ?bool $isVisible = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createAd = null;
+    /** Mappé sur la colonne historique `create_ad` (schéma initial). */
+    #[ORM\Column(name: 'create_ad')]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {
@@ -97,14 +98,14 @@ class Review
         return $this;
     }
 
-    public function getCreateAd(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->createAd;
+        return $this->createdAt;
     }
 
-    public function setCreateAd(\DateTimeImmutable $createAd): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->createAd = $createAd;
+        $this->createdAt = $createdAt;
 
         return $this;
     }

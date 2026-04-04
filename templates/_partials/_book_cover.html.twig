@@ -3,10 +3,18 @@
 {% set alt = 'Couverture : ' ~ book.title %}
 <div class="book-cover book-cover--{{ variant }}">
     {% if book.coverImagePath %}
-        <img src="{{ book.coverImagePath }}" alt="{{ alt }}" loading="lazy" width="300" height="400" decoding="async">
+        <img src="{{ book.coverImagePath }}" alt="{{ alt }}" loading="lazy" width="300" height="400" decoding="async" class="book-cover__img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div class="book-cover__placeholder book-cover__placeholder--fallback" style="display:none;">
+            <svg class="book-cover__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <path fill="currentColor" fill-opacity="0.35" d="M6 3h7c1.1 0 2 .9 2 2v16H7c-.6 0-1-.4-1-1V4c0-.6.4-1 1-1zm4.2 0H18c1.1 0 2 .9 2 2v15c0 .6-.4 1-1 1H9.2V3z"/>
+            </svg>
+            <span class="visually-hidden">{{ alt }}</span>
+        </div>
     {% else %}
         <div class="book-cover__placeholder">
-            <span class="book-cover__initials" aria-hidden="true">{{ book.title|slice(0, 2)|upper }}</span>
+            <svg class="book-cover__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <path fill="currentColor" fill-opacity="0.35" d="M6 3h7c1.1 0 2 .9 2 2v16H7c-.6 0-1-.4-1-1V4c0-.6.4-1 1-1zm4.2 0H18c1.1 0 2 .9 2 2v15c0 .6-.4 1-1 1H9.2V3z"/>
+            </svg>
             <span class="visually-hidden">{{ alt }}</span>
         </div>
     {% endif %}

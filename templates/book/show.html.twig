@@ -4,7 +4,7 @@
 
 {% block body %}
     {% include '_partials/_nav.html.twig' %}
-    <main class="container page-book">
+    <main class="container page-book" id="main-content">
         <p class="breadcrumb">
             <a href="{{ path('app_home') }}">Accueil</a>
             · <a href="{{ path('app_catalog') }}">Catalogue</a>
@@ -72,6 +72,20 @@
                                     {% if isFavorite %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}
                                 </button>
                             </form>
+                            {% if userWaitlistEntry %}
+                                <div class="book-actions__hint">
+                                    <p class="book-actions__hint">Vous êtes sur la <strong>liste d’attente</strong> ({{ waitlistTotal }} personne{{ waitlistTotal > 1 ? 's' : '' }}).</p>
+                                    <form method="post" action="{{ path('app_book_waitlist_leave', { id: userWaitlistEntry.id }) }}" class="book-actions__form book-actions__form--inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('waitlist_leave') }}">
+                                        <button type="submit" class="btn btn--ghost btn--small">Quitter la liste</button>
+                                    </form>
+                                </div>
+                            {% elseif canJoinWaitlist %}
+                                <form method="post" action="{{ path('app_book_waitlist_join', { id: book.id }) }}" class="book-actions__form">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('waitlist_join') }}">
+                                    <button type="submit" class="btn btn--secondary">S’inscrire sur la liste d’attente</button>
+                                </form>
+                            {% endif %}
                         {% else %}
                             {% set path_here = app.request.pathinfo %}
                             <a href="{{ path('app_login', { redirect: path_here, from: 'reserve' }) }}" class="btn btn--primary">Réserver</a>
@@ -114,7 +128,7 @@
                                 {% for r in reviews %}
                                     <li class="book-reviews__item">
                                         <p class="book-stars" aria-hidden="true">{% for i in 1..r.rating %}★{% endfor %}</p>
-                                        <p class="book-reviews__meta text-muted">{{ r.createAd|date('d/m/Y') }}</p>
+                                        <p class="book-reviews__meta text-muted">{{ r.createdAt|date('d/m/Y') }}</p>
                                         <p>{{ r.comment|nl2br }}</p>
                                     </li>
                                 {% endfor %}

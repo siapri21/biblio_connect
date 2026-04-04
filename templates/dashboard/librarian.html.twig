@@ -4,19 +4,19 @@
 
 {% block body %}
     {% include '_partials/_nav.html.twig' %}
-    <main class="container dashboard-page admin-dashboard">
-        <header class="admin-dashboard__header">
-            <p class="admin-dashboard__eyebrow">Espace personnel</p>
+    <main class="container dashboard-page admin-dashboard dashboard-shell" id="main-content">
+        <header class="admin-dashboard__header dashboard-shell__hero">
+            <p class="admin-dashboard__eyebrow">Espace professionnel</p>
             <h1 class="page-title admin-dashboard__title">Espace bibliothécaire</h1>
             <p class="admin-dashboard__subtitle">
-                Bonjour <strong>{{ app.user.userIdentifier }}</strong> — suivi du catalogue et des réservations.
+                Bonjour <strong>{{ app.user.userIdentifier }}</strong> — suivez les réservations et le catalogue depuis un seul endroit.
             </p>
         </header>
 
         {% if is_granted('ROLE_ADMIN') %}
-            <p class="flash flash--info librarian-dashboard__admin-hint">
-                Vous avez aussi les droits <strong>administrateur</strong> : la
-                <a href="{{ path('app_admin_dashboard') }}">console Admin</a> regroupe stocks, réservations en attente, modération des avis et gestion des comptes.
+            <p class="flash flash--info flash--soft librarian-dashboard__admin-hint">
+                Vous disposez aussi du rôle <strong>administrateur</strong> : accédez à la
+                <a href="{{ path('app_admin_dashboard') }}">console d’administration</a> pour la modération et les comptes.
             </p>
         {% endif %}
 
@@ -33,35 +33,68 @@
                 <span class="admin-stats__value">{{ statReviewsVisible }}</span>
                 <span class="admin-stats__label">Avis publiés</span>
             </div>
+            <div class="admin-stats__item">
+                <span class="admin-stats__value">{{ statReservationsTotal }}</span>
+                <span class="admin-stats__label">Réservations (total)</span>
+            </div>
+            <div class="admin-stats__item admin-stats__item--accent">
+                <span class="admin-stats__value">{{ statReservationsOverdue }}</span>
+                <span class="admin-stats__label">Prêts confirmés en retard</span>
+            </div>
+            <div class="admin-stats__item">
+                <span class="admin-stats__value">{{ statReservationsCompleted }}</span>
+                <span class="admin-stats__label">Prêts terminés</span>
+            </div>
         </section>
+
+        {% if topBooks is not empty %}
+        <section class="admin-top-books" aria-labelledby="top-books-title">
+            <h2 id="top-books-title" class="dashboard-card__title">Ouvrages les plus réservés</h2>
+            <ol class="admin-top-books__list">
+                {% for row in topBooks %}
+                    <li><a href="{{ path('app_book_show', { id: row.book.id }) }}">{{ row.book.title }}</a> <span class="text-muted">— {{ row.count }} réservation{{ row.count > 1 ? 's' : '' }}</span></li>
+                {% endfor %}
+            </ol>
+        </section>
+        {% endif %}
 
         <section class="admin-actions" aria-labelledby="librarian-actions-title">
             <h2 id="librarian-actions-title" class="visually-hidden">Actions</h2>
             <div class="admin-actions__grid">
                 <a href="{{ path('app_librarian_reservations') }}" class="admin-action-card">
-                    <span class="admin-action-card__glyph" aria-hidden="true">R</span>
+                    <span class="admin-action-card__icon" aria-hidden="true">{% include '_partials/_dashboard_icons.html.twig' with { name: 'list' } %}</span>
                     <span class="admin-action-card__title">Historique des réservations</span>
                     <span class="admin-action-card__desc">Toutes les demandes, tous statuts.</span>
                 </a>
                 <a href="{{ path('app_librarian_reservations', { status: 'pending' }) }}" class="admin-action-card">
-                    <span class="admin-action-card__glyph" aria-hidden="true">⏳</span>
+                    <span class="admin-action-card__icon" aria-hidden="true">{% include '_partials/_dashboard_icons.html.twig' with { name: 'clock' } %}</span>
                     <span class="admin-action-card__title">Réservations en attente</span>
-                    <span class="admin-action-card__desc">Filtrer uniquement les demandes à traiter.</span>
+                    <span class="admin-action-card__desc">Demandes à traiter en priorité.</span>
                 </a>
                 <a href="{{ path('app_admin_book_list') }}" class="admin-action-card">
-                    <span class="admin-action-card__glyph" aria-hidden="true">C</span>
+                    <span class="admin-action-card__icon" aria-hidden="true">{% include '_partials/_dashboard_icons.html.twig' with { name: 'book' } %}</span>
                     <span class="admin-action-card__title">Catalogue (gestion)</span>
-                    <span class="admin-action-card__desc">Liste des ouvrages, modifier les fiches.</span>
+                    <span class="admin-action-card__desc">Liste des ouvrages et modification des fiches.</span>
                 </a>
                 <a href="{{ path('app_admin_book_new') }}" class="admin-action-card">
-                    <span class="admin-action-card__glyph" aria-hidden="true">+</span>
+                    <span class="admin-action-card__icon" aria-hidden="true">{% include '_partials/_dashboard_icons.html.twig' with { name: 'plus' } %}</span>
                     <span class="admin-action-card__title">Nouvel ouvrage</span>
-                    <span class="admin-action-card__desc">Titre, auteur, catégorie, langue, image, stock.</span>
+                    <span class="admin-action-card__desc">Ajouter un titre au catalogue.</span>
                 </a>
                 <a href="{{ path('app_catalog') }}" class="admin-action-card admin-action-card--muted">
-                    <span class="admin-action-card__glyph" aria-hidden="true">◇</span>
+                    <span class="admin-action-card__icon" aria-hidden="true">{% include '_partials/_dashboard_icons.html.twig' with { name: 'globe' } %}</span>
                     <span class="admin-action-card__title">Catalogue public</span>
-                    <span class="admin-action-card__desc">Voir le site tel que les usagers.</span>
+                    <span class="admin-action-card__desc">Affichage côté lecteurs.</span>
+                </a>
+                <a href="{{ path('app_staff_export_catalog') }}" class="admin-action-card">
+                    <span class="admin-action-card__icon" aria-hidden="true">{% include '_partials/_dashboard_icons.html.twig' with { name: 'list' } %}</span>
+                    <span class="admin-action-card__title">Export catalogue (CSV)</span>
+                    <span class="admin-action-card__desc">Télécharger la liste des ouvrages.</span>
+                </a>
+                <a href="{{ path('app_staff_export_reservations') }}" class="admin-action-card">
+                    <span class="admin-action-card__icon" aria-hidden="true">{% include '_partials/_dashboard_icons.html.twig' with { name: 'list' } %}</span>
+                    <span class="admin-action-card__title">Export réservations (CSV)</span>
+                    <span class="admin-action-card__desc">Historique des demandes.</span>
                 </a>
             </div>
         </section>

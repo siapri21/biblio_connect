@@ -26,9 +26,20 @@ class DashboardController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
+        $reservations = $reservationRepository->findByMemberOrdered($user);
+        $activeReservations = array_values(array_filter(
+            $reservations,
+            static fn ($r) => \in_array($r->getStatus(), ['pending', 'confirmed'], true),
+        ));
+        $pastReservations = array_values(array_filter(
+            $reservations,
+            static fn ($r) => \in_array($r->getStatus(), ['completed', 'cancelled'], true),
+        ));
+
         return $this->render('dashboard/user.html.twig', [
             'favorites' => $favoriteRepository->findByMemberOrdered($user),
-            'reservations' => $reservationRepository->findByMemberOrdered($user),
+            'activeReservations' => $activeReservations,
+            'pastReservations' => $pastReservations,
             'reviews' => $reviewRepository->findByMemberOrdered($user),
         ]);
     }
@@ -44,6 +55,10 @@ class DashboardController extends AbstractController
             'statBooks' => $bookRepository->count([]),
             'statReservationsPending' => $reservationRepository->countByStatus('pending'),
             'statReviewsVisible' => $reviewRepository->countVisible(),
+            'statReservationsTotal' => $reservationRepository->countTotal(),
+            'statReservationsOverdue' => $reservationRepository->countOverdueConfirmed(),
+            'statReservationsCompleted' => $reservationRepository->countByStatus('completed'),
+            'topBooks' => $bookRepository->findTopBooksByReservationVolume(5),
         ]);
     }
 
@@ -58,6 +73,10 @@ class DashboardController extends AbstractController
             'statBooks' => $bookRepository->count([]),
             'statReservationsPending' => $reservationRepository->countByStatus('pending'),
             'statReviewsVisible' => $reviewRepository->countVisible(),
+            'statReservationsTotal' => $reservationRepository->countTotal(),
+            'statReservationsOverdue' => $reservationRepository->countOverdueConfirmed(),
+            'statReservationsCompleted' => $reservationRepository->countByStatus('completed'),
+            'topBooks' => $bookRepository->findTopBooksByReservationVolume(5),
         ]);
     }
 }

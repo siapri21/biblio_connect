@@ -38,7 +38,7 @@
                     <tbody>
                         {% for rev in reviews %}
                             <tr>
-                                <td>{{ rev.createAd ? rev.createAd|date('d/m/Y H:i') : '—' }}</td>
+                                <td>{{ rev.createdAt ? rev.createdAt|date('d/m/Y H:i') : '—' }}</td>
                                 <td>
                                     {% if rev.book %}
                                         <a href="{{ path('app_book_show', { id: rev.book.id }) }}">{{ rev.book.title }}</a>

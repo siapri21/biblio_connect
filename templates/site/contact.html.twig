@@ -1,0 +1,50 @@
+{% extends 'site/_site_page_shell.html.twig' %}
+
+{% block title %}Contact — Biblio Connect{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Contactez Biblio Connect — adresse, horaires et service usagers.">
+{% endblock %}
+
+{% block site_content %}
+    <div class="contact-page">
+        <header class="contact-page__hero">
+            <p class="contact-page__eyebrow">Service usagers</p>
+            <h1 class="page-title contact-page__title">Contact</h1>
+            <p class="contact-page__intro">
+                Une question sur le catalogue, les réservations ou votre compte ? Notre équipe vous répond dans les meilleurs délais.
+            </p>
+        </header>
+
+        <div class="contact-page__grid">
+            <article class="contact-card contact-card--elevated">
+                <h2 class="contact-card__title">Coordonnées</h2>
+                <ul class="contact-page__list">
+                    <li>
+                        <span class="contact-page__label">Adresse</span>
+                        <span class="contact-page__value">12 rue des Livres<br>75000 Paris</span>
+                    </li>
+                    <li>
+                        <span class="contact-page__label">E-mail</span>
+                        <a href="mailto:contact@biblio-connect.local" class="contact-page__value contact-page__link">contact@biblio-connect.local</a>
+                    </li>
+                    <li>
+                        <span class="contact-page__label">Horaires d’accueil</span>
+                        <span class="contact-page__value">Mardi au samedi, 10 h – 18 h</span>
+                    </li>
+                </ul>
+            </article>
+
+            <article class="contact-card contact-card--elevated">
+                <h2 class="contact-card__title">Accès professionnels</h2>
+                <p class="contact-card__text">
+                    Les comptes bibliothécaire et administrateur sont attribués par l’administration du réseau.
+                    Pour toute demande, précisez votre établissement dans votre message.
+                </p>
+                <p class="contact-card__text">
+                    <a href="{{ path('app_login') }}" class="contact-page__inline-link">Connexion à l’espace pro</a>
+                </p>
+            </article>
+        </div>
+    </div>
+{% endblock %}

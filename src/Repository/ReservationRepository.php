@@ -58,6 +58,31 @@ class ReservationRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function countTotal(): int
+    {
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Prêts confirmés dont la date de fin est dépassée (retour attendu).
+     */
+    public function countOverdueConfirmed(): int
+    {
+        $today = new \DateTimeImmutable('today');
+
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->andWhere('r.status = :st')
+            ->andWhere('r.endAt < :today')
+            ->setParameter('st', 'confirmed')
+            ->setParameter('today', $today)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function hasActiveReservationForMemberAndBook(User $member, Book $book): bool
     {
         $count = (int) $this->createQueryBuilder('r')

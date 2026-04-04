@@ -1,0 +1,41 @@
+<footer class="site-footer">
+    <div class="container site-footer__grid">
+        <div class="site-footer__col site-footer__col--brand">
+            <a href="{{ path('app_home') }}" class="site-footer__brand-link">Biblio Connect</a>
+            <p class="site-footer__tagline">Catalogue en ligne, réservations et avis — une expérience unifiée pour les lecteurs et les équipes.</p>
+        </div>
+        <nav class="site-footer__col" aria-label="Navigation pied de page">
+            <p class="site-footer__heading">Découvrir</p>
+            <ul class="site-footer__links">
+                <li><a href="{{ path('app_catalog') }}">Catalogue</a></li>
+                <li><a href="{{ path('app_login') }}">Connexion</a></li>
+                <li><a href="{{ path('app_register') }}">Inscription</a></li>
+            </ul>
+        </nav>
+        <nav class="site-footer__col" aria-label="Informations légales">
+            <p class="site-footer__heading">Informations</p>
+            <ul class="site-footer__links">
+                <li><a href="{{ path('app_mentions_legales') }}">Mentions légales</a></li>
+                <li><a href="{{ path('app_confidentialite') }}">Confidentialité</a></li>
+                <li><a href="{{ path('app_contact') }}">Contact</a></li>
+                <li><a href="{{ path('app_help') }}">Aide &amp; FAQ</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="site-footer__social-row">
+        <div class="container site-footer__social-inner">
+            <span class="site-footer__social-label">Suivez-nous</span>
+            <div class="site-footer__social" role="list">
+                <a href="https://www.facebook.com" class="site-footer__social-link" rel="noopener noreferrer" target="_blank" aria-label="Facebook">f</a>
+                <a href="https://twitter.com" class="site-footer__social-link" rel="noopener noreferrer" target="_blank" aria-label="X (Twitter)">𝕏</a>
+                <a href="https://www.instagram.com" class="site-footer__social-link" rel="noopener noreferrer" target="_blank" aria-label="Instagram">◎</a>
+            </div>
+        </div>
+    </div>
+    <div class="site-footer__bottom">
+        <div class="container site-footer__bottom-inner">
+            <span class="site-footer__copy">&copy; {{ 'now'|date('Y') }} Biblio Connect</span>
+            <span class="site-footer__note">Biblio Connect — plateforme de bibliothèque en ligne.</span>
+        </div>
+    </div>
+</footer>

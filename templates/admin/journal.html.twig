@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Journal d’activité — Biblio Connect{% endblock %}
+
+{% block body %}
+    {% include '_partials/_nav.html.twig' %}
+    <main class="container dashboard-page admin-dashboard" id="main-content">
+        <header class="admin-dashboard__header">
+            <p class="admin-dashboard__eyebrow">Traçabilité</p>
+            <h1 class="page-title">Journal d’activité</h1>
+            <p class="admin-dashboard__subtitle">Dernières actions enregistrées (création ou modification d’ouvrages, réservations, rôles, modération).</p>
+        </header>
+
+        <div class="staff-table-wrap">
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Action</th>
+                        <th>Type</th>
+                        <th>ID</th>
+                        <th>Compte</th>
+                        <th>Détail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        <tr>
+                            <td>{{ log.createdAt|date('d/m/Y H:i') }}</td>
+                            <td>{{ log.action }}</td>
+                            <td>{{ log.entityType }}</td>
+                            <td>{{ log.entityId ?? '—' }}</td>
+                            <td>{{ log.user ? log.user.userIdentifier : '—' }}</td>
+                            <td class="admin-review-comment">{{ log.details ?? '—' }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">Aucune entrée pour le moment.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p class="dashboard-card__more"><a href="{{ path('app_admin_dashboard') }}">← Console admin</a></p>
+    </main>
+{% endblock %}

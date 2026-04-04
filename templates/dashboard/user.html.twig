@@ -4,27 +4,28 @@
 
 {% block body %}
     {% include '_partials/_nav.html.twig' %}
-    <main class="container dashboard-page dashboard-user">
+    <main class="container dashboard-page dashboard-user dashboard-shell" id="main-content">
         {% for message in app.flashes('success') %}
             <p class="flash flash--success">{{ message }}</p>
         {% endfor %}
         {% for message in app.flashes('info') %}
             <p class="flash flash--info">{{ message }}</p>
         {% endfor %}
-        <header class="dashboard-user__header">
+        <header class="dashboard-user__header dashboard-shell__hero">
+            <p class="dashboard-user__eyebrow">Compte lecteur</p>
             <h1 class="page-title">Mon espace</h1>
             <p class="dashboard-user__welcome">Bienvenue, <strong>{{ app.user.userIdentifier }}</strong>.</p>
             <p class="text-muted dashboard-user__lead">
-                Retrouvez vos réservations (planning de retrait), vos favoris et vos avis.
+                Réservations actives, historique des prêts, favoris et avis.
             </p>
         </header>
 
         <div class="dashboard-user__grid">
             <section class="dashboard-card" aria-labelledby="dash-reservations">
-                <h2 id="dash-reservations" class="dashboard-card__title">Mes réservations</h2>
-                {% if reservations is not empty %}
+                <h2 id="dash-reservations" class="dashboard-card__title">Réservations en cours</h2>
+                {% if activeReservations is not empty %}
                     <ul class="dashboard-list dashboard-list--media">
-                        {% for r in reservations %}
+                        {% for r in activeReservations %}
                             <li class="dashboard-list__item dashboard-list__item--media">
                                 <a href="{{ path('app_book_show', { id: r.book.id }) }}" class="dashboard-list__cover" tabindex="-1" aria-hidden="true">
                                     {% include '_partials/_book_cover.html.twig' with { book: r.book, variant: 'thumb' } %}
@@ -37,6 +38,7 @@
                                             <strong>Retrait :</strong> {{ r.book.library.name }}
                                             {% if r.book.library.city %}({{ r.book.library.city }}){% endif %}
                                             · du {{ r.startAt|date('d/m/Y') }} au {{ r.endAt|date('d/m/Y') }}
+                                            {% if r.extensionCount > 0 %}<span class="text-muted"> ({{ r.extensionCount }} prolong.)</span>{% endif %}
                                         </p>
                                     {% else %}
                                         <p class="dashboard-list__meta">Du {{ r.startAt|date('d/m/Y') }} au {{ r.endAt|date('d/m/Y') }}</p>
@@ -57,13 +59,44 @@
                                                 <button type="submit" class="btn btn--ghost btn--small">Annuler</button>
                                             </form>
                                         {% endif %}
+                                        {% if r.canMemberRequestExtension() %}
+                                            <form method="post" action="{{ path('app_reservation_extend', { id: r.id }) }}" class="dashboard-reservation-cancel" data-confirm="Prolonger le prêt de 14 jours ?">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('extend_reservation') }}">
+                                                <button type="submit" class="btn btn--secondary btn--small">Prolonger 14 j.</button>
+                                            </form>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </li>
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p class="dashboard-card__empty">Aucune réservation. <a href="{{ path('app_catalog') }}">Parcourir le catalogue</a></p>
+                    <p class="dashboard-card__empty">Aucune réservation active. <a href="{{ path('app_catalog') }}">Parcourir le catalogue</a></p>
+                {% endif %}
+            </section>
+
+            <section class="dashboard-card" aria-labelledby="dash-history">
+                <h2 id="dash-history" class="dashboard-card__title">Historique des prêts</h2>
+                {% if pastReservations is not empty %}
+                    <ul class="dashboard-list dashboard-list--media">
+                        {% for r in pastReservations %}
+                            <li class="dashboard-list__item dashboard-list__item--media">
+                                <a href="{{ path('app_book_show', { id: r.book.id }) }}" class="dashboard-list__cover" tabindex="-1" aria-hidden="true">
+                                    {% include '_partials/_book_cover.html.twig' with { book: r.book, variant: 'thumb' } %}
+                                </a>
+                                <div class="dashboard-list__body">
+                                    <a href="{{ path('app_book_show', { id: r.book.id }) }}" class="dashboard-list__book">{{ r.book.title }}</a>
+                                    <span class="text-muted"> — {{ r.book.author }}</span>
+                                    <p class="dashboard-list__meta">
+                                        {{ r.startAt|date('d/m/Y') }} → {{ r.endAt|date('d/m/Y') }}
+                                        · <span class="badge badge--neutral">{% if r.status == 'completed' %}Terminée{% else %}Annulée{% endif %}</span>
+                                    </p>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="dashboard-card__empty">Aucun prêt terminé ou annulé pour le moment.</p>
                 {% endif %}
             </section>
 
@@ -106,7 +139,7 @@
                                             <a href="{{ path('app_book_show', { id: rev.book.id }) }}"><strong>{{ rev.book.title }}</strong></a>
                                             <span class="book-stars" aria-hidden="true">{% for i in 1..rev.rating %}★{% endfor %}</span>
                                         </p>
-                                        <p class="dashboard-list__meta">{{ rev.createAd|date('d/m/Y') }}</p>
+                                        <p class="dashboard-list__meta">{{ rev.createdAt|date('d/m/Y') }}</p>
                                         <p>{{ rev.comment|nl2br }}</p>
                                     </div>
                                 </li>
@@ -121,6 +154,7 @@
 
         <nav class="dashboard-user__nav" aria-label="Raccourcis">
             <a href="{{ path('app_catalog') }}">Catalogue</a>
+            <a href="{{ path('app_help') }}">Aide</a>
             <a href="{{ path('app_favorites') }}">Favoris</a>
             <a href="{{ path('app_home') }}">Accueil</a>
         </nav>

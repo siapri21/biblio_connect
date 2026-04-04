@@ -35,6 +35,9 @@ class Reservation
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
 
+    #[ORM\Column]
+    private int $extensionCount = 0;
+
     public function __construct()
     {
         $now = new \DateTimeImmutable();
@@ -118,6 +121,34 @@ class Reservation
         $this->createdAt = $createdAt;
 
         return $this;
+    }
+
+    public function getExtensionCount(): int
+    {
+        return $this->extensionCount;
+    }
+
+    public function setExtensionCount(int $extensionCount): static
+    {
+        $this->extensionCount = $extensionCount;
+
+        return $this;
+    }
+
+    /**
+     * Prolongation unique du prêt (+ jours) tant que le prêt est confirmé et non terminé.
+     */
+    public function canMemberRequestExtension(int $maxExtensions = 1): bool
+    {
+        if ($this->status !== 'confirmed') {
+            return false;
+        }
+        if ($this->extensionCount >= $maxExtensions) {
+            return false;
+        }
+        $today = (new \DateTimeImmutable('today'))->setTime(0, 0);
+
+        return $this->endAt >= $today;
     }
 
     /**
