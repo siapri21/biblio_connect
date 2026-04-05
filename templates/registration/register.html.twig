@@ -43,9 +43,36 @@
             {% if redirect_path is defined and redirect_path %}
                 <input type="hidden" name="redirect" value="{{ redirect_path }}">
             {% endif %}
+            {{ form_row(registrationForm.name) }}
             {{ form_row(registrationForm.email) }}
-            {{ form_row(registrationForm.plainPassword.first) }}
-            {{ form_row(registrationForm.plainPassword.second) }}
+
+            <div class="form-card-field">
+                {{ form_label(registrationForm.plainPassword.first) }}
+                <div class="password-input-wrap" data-controller="password-visibility">
+                    {{ form_widget(registrationForm.plainPassword.first, {
+                        attr: registrationForm.plainPassword.first.vars.attr|default({})|merge({
+                            class: 'input password-input-wrap__field',
+                            'data-password-visibility-target': 'input',
+                        })
+                    }) }}
+                    {% include '_partials/_password_toggle_button.html.twig' %}
+                </div>
+                {{ form_errors(registrationForm.plainPassword.first) }}
+            </div>
+
+            <div class="form-card-field">
+                {{ form_label(registrationForm.plainPassword.second) }}
+                <div class="password-input-wrap" data-controller="password-visibility">
+                    {{ form_widget(registrationForm.plainPassword.second, {
+                        attr: registrationForm.plainPassword.second.vars.attr|default({})|merge({
+                            class: 'input password-input-wrap__field',
+                            'data-password-visibility-target': 'input',
+                        })
+                    }) }}
+                    {% include '_partials/_password_toggle_button.html.twig' %}
+                </div>
+                {{ form_errors(registrationForm.plainPassword.second) }}
+            </div>
             {{ form_row(registrationForm.agreeTerms) }}
 
             <button type="submit" class="btn btn--primary btn--block">S’inscrire</button>

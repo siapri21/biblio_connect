@@ -105,7 +105,7 @@
         <div class="container">
             <div class="landing-section-head">
                 <h2 id="carousel-title" class="landing-section-head__title">Vos lectures du moment</h2>
-                <p class="landing-section-head__lead">Sélection récente du catalogue — notes basées sur les avis des lecteurs.</p>
+                <p class="landing-section-head__lead">Sélection récente du catalogue, notes basées sur les avis des lecteurs.</p>
             </div>
             {% if carouselBooks is not empty %}
                 <div class="landing-carousel" data-controller="landing-carousel">
@@ -135,7 +135,7 @@
                                                     <span class="landing-book-card__norating">Pas encore d’avis</span>
                                                 {% endif %}
                                             </div>
-                                            <a href="{{ path('app_book_show', { id: book.id }) }}" class="landing-book-card__more">Voir la fiche →</a>
+                                            <a href="{{ path('app_book_show', { id: book.id }) }}" class="landing-book-card__more ">Voir la fiche →</a>
                                         </div>
                                     </article>
                                 </li>

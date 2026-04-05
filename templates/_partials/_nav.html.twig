@@ -41,7 +41,7 @@
                     {% endif %}
                 </div>
                 <div class="landing-header__session">
-                    <span class="landing-header__user" title="{{ app.user.userIdentifier }}">{{ app.user.userIdentifier }}</span>
+                    <span class="landing-header__user" title="{{ app.user.userIdentifier }}">Hey, {{ app.user.displayName }}</span>
                     <a href="{{ path('app_logout') }}" class="landing-header__link landing-header__link--compact landing-header__logout">Déconnexion</a>
                 </div>
             {% else %}

@@ -28,12 +28,14 @@ final class UserFixtures extends Fixture
     {
         $librarian = (new User())
             ->setEmail('bibliothecaire@biblio-connect.local')
+            ->setName('Camille Dupont')
             ->setRoles(['ROLE_LIBRARIAN'])
             ->setIsVerified(true);
         $librarian->setPassword($this->passwordHasher->hashPassword($librarian, 'Biblio!demo2026'));
 
         $admin = (new User())
             ->setEmail('admin@biblio-connect.local')
+            ->setName('Alex Martin')
             ->setRoles(['ROLE_ADMIN'])
             ->setIsVerified(true);
         $admin->setPassword($this->passwordHasher->hashPassword($admin, 'Admin!demo2026'));

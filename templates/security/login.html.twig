@@ -36,7 +36,10 @@
                 </p>
                 <p>
                     <label for="password">Mot de passe</label>
-                    <input type="password" id="password" name="_password" required class="input" autocomplete="current-password">
+                    <div class="password-input-wrap" data-controller="password-visibility">
+                        <input type="password" id="password" name="_password" required class="input password-input-wrap__field" autocomplete="current-password" data-password-visibility-target="input">
+                        {% include '_partials/_password_toggle_button.html.twig' %}
+                    </div>
                 </p>
                 <button type="submit" class="btn btn--primary btn--block">Se connecter</button>
             </form>

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Espace usager — Biblio Connect{% endblock %}
+{% block title %}Espace usager Biblio Connect{% endblock %}
 
 {% block body %}
     {% include '_partials/_nav.html.twig' %}
@@ -14,7 +14,7 @@
         <header class="dashboard-user__header dashboard-shell__hero">
             <p class="dashboard-user__eyebrow">Compte lecteur</p>
             <h1 class="page-title">Mon espace</h1>
-            <p class="dashboard-user__welcome">Bienvenue, <strong>{{ app.user.userIdentifier }}</strong>.</p>
+            <p class="dashboard-user__welcome">Hey, <strong>{{ app.user.displayName }}</strong>.</p>
             <p class="text-muted dashboard-user__lead">
                 Réservations actives, historique des prêts, favoris et avis.
             </p>

@@ -24,6 +24,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
+    #[ORM\Column(length: 120, nullable: true)]
+    private ?string $name = null;
+
     /**
      * @var list<string> The user roles
      */
@@ -79,6 +82,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $email;
 
         return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): static
+    {
+        if ($name === null) {
+            $this->name = null;
+        } else {
+            $t = trim($name);
+            $this->name = $t === '' ? null : $t;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Prénom / nom affiché (salutations). Sans nom en base, utilise la partie locale de l’e-mail.
+     */
+    public function getDisplayName(): string
+    {
+        if ($this->name !== null && $this->name !== '') {
+            return $this->name;
+        }
+
+        $email = (string) $this->email;
+        $at = strpos($email, '@');
+
+        return $at !== false ? substr($email, 0, $at) : $email;
     }
 
     /**
