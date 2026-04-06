@@ -1,9 +1,13 @@
 
 ###> symfony/framework-bundle ###
+# Ne pas versionner les fichiers d’environnement (secrets, URL BDD).
+# Si ces fichiers ont déjà été commités : git rm --cached .env .env.dev .env.test
+/.env
+/.env.dev
+/.env.test
 /.env.local
 /.env.local.php
 /.env.*.local
-/.env
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
